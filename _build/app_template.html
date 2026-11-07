@@ -1,0 +1,1034 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<!-- Configuration de l'export Google Sheets. Valeurs injectées à la construction
+     par build.py depuis _build/config.txt ; surchargeable par le professeur
+     (onglet Fiche professeur, code 2027) et mémorisée en localStorage. -->
+<meta name="sheet-url" content="__URL_SHEET__">
+<meta name="sheet-jeton" content="__JETON_SHEET__">
+<title>L’énergie des muscles — La respiration cellulaire (SVT 3e)</title>
+<style>
+  :root {
+    --vert: #115e59;
+    --vert2: #0f766e;
+    --vert3: #0d9488;
+    --ambre: #f59e0b;
+    --encre: #12303a;
+    --gris: #58707a;
+    --fond: #f2f7f6;
+    --carte: #ffffff;
+    --ligne: #dce9e6;
+    --sombre: #071a26;
+    --cyan: #57d7ff;
+    --or: #ffd84d;
+  }
+
+  * { box-sizing: border-box; }
+  html, body { height: 100%; }
+  body {
+    margin: 0;
+    color: var(--encre);
+    background: var(--fond);
+    font-family: "Segoe UI", system-ui, -apple-system, Arial, sans-serif;
+    font-size: 15px;
+    line-height: 1.55;
+  }
+  button, input, select, textarea { font: inherit; }
+  button { cursor: pointer; }
+  :focus-visible { outline: 3px solid var(--ambre); outline-offset: 2px; }
+  h1, h2, h3, h4, p { margin-top: 0; }
+  a { color: var(--vert2); }
+
+  /* ----------------- squelette ----------------- */
+  #app {
+    display: grid;
+    grid-template-rows: auto auto 1fr auto;
+    height: 100vh;
+    overflow: hidden;
+  }
+
+  header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 16px;
+    padding: 10px 22px;
+    color: #fff;
+    background: linear-gradient(110deg, #134e4a 0%, #0f766e 58%, #0d9488 100%);
+    box-shadow: 0 2px 12px rgba(9, 60, 56, .22);
+    z-index: 5;
+  }
+  .kicker { font-size: .72rem; letter-spacing: 1.3px; text-transform: uppercase; opacity: .9; }
+  header h1 { margin: 1px 0 0; font-size: clamp(1.05rem, 2vw, 1.5rem); line-height: 1.15; }
+  header h1 span { font-weight: 400; opacity: .92; }
+  header .soustitre { margin: 2px 0 0; font-size: .79rem; opacity: .9; }
+  .entete-actions { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; justify-content: flex-end; }
+  .badge-horsligne {
+    font-size: .74rem; white-space: nowrap; padding: 5px 10px;
+    border: 1px solid rgba(255,255,255,.45); border-radius: 999px;
+    background: rgba(255,255,255,.1);
+  }
+  header button {
+    color: #0b4944; background: #fff; border: 0; border-radius: 8px;
+    padding: 7px 12px; font-size: .82rem; font-weight: 650; white-space: nowrap;
+  }
+  header button:hover { background: #e6fffa; }
+
+  #onglets {
+    display: flex; gap: 0; overflow-x: auto;
+    background: #fff; border-bottom: 1px solid var(--ligne); z-index: 4;
+  }
+  .onglet {
+    flex: 1 0 auto; padding: 11px 18px; border: 0;
+    border-bottom: 3px solid transparent; background: transparent;
+    color: var(--gris); font-size: .9rem; font-weight: 600; white-space: nowrap;
+    transition: color .18s, background .18s, border-color .18s;
+  }
+  .onglet:hover { color: var(--vert); background: #f0fbf8; }
+  .onglet.actif { color: var(--vert); border-bottom-color: var(--ambre); background: #f0fbf8; }
+
+  #panneaux { min-height: 0; display: flex; flex-direction: column; overflow: hidden; }
+  .panneau { display: none; height: 100%; overflow-y: auto; padding: 22px 24px 30px; }
+  .panneau.actif { display: block; }
+  #panneau-3d { padding: 0; }
+  #panneau-3d.actif { display: flex; flex-direction: column; overflow: hidden; }
+
+  footer {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap;
+    gap: 6px 20px; padding: 7px 20px; font-size: .75rem; color: var(--gris);
+    background: #e8f1ef; border-top: 1px solid var(--ligne); z-index: 4;
+  }
+  .legende-pied { display: flex; flex-wrap: wrap; gap: 4px 14px; align-items: center; }
+  .puce { display: inline-block; width: 10px; height: 10px; border-radius: 50%; margin-right: 5px; vertical-align: -1px; }
+  .credits { opacity: .8; }
+
+  /* ----------------- onglet 3D ----------------- */
+  #zone3d {
+    position: relative; flex: 1; min-height: 300px; overflow: hidden;
+    background:
+      radial-gradient(ellipse at 45% 45%, #12394a 0%, #0a2534 48%, #061620 100%);
+  }
+  #scene { position: absolute; inset: 0; }
+  #scene canvas { display: block; outline: none; }
+  #secours3d {
+    display: none; position: absolute; inset: 0; z-index: 3;
+    align-items: center; justify-content: center; text-align: center;
+    color: #cfe9f5; padding: 30px; font-size: .95rem;
+  }
+  #secours3d.visible { display: flex; }
+
+  #commandes {
+    position: absolute; top: 14px; right: 14px; z-index: 4;
+    width: 282px; max-width: calc(100% - 28px); padding: 13px 14px;
+    color: #dff2fb;
+    background: rgba(6, 24, 36, .9); border: 1px solid rgba(120, 210, 255, .24);
+    border-radius: 14px; box-shadow: 0 14px 36px rgba(0,0,0,.4);
+    backdrop-filter: blur(8px);
+  }
+  #commandes h2 { margin: 0 0 10px; font-size: .93rem; color: #bdeeff; }
+  .rangee { display: flex; gap: 7px; margin-bottom: 9px; }
+  #commandes button {
+    color: #eaf9ff; background: #17668a; border: 1px solid rgba(255,255,255,.12);
+    border-radius: 8px; padding: 7px 9px; font-size: .8rem; transition: background .18s;
+  }
+  #commandes button:hover { background: #2186b2; }
+  #lecture { flex: 1; }
+  .reglage { display: grid; grid-template-columns: 60px 1fr 34px; align-items: center; gap: 8px; margin: 8px 0; }
+  .reglage label { font-size: .8rem; color: #a8c9db; }
+  .reglage span { font-size: .77rem; color: #cfeaf7; text-align: right; }
+  input[type="range"] { width: 100%; accent-color: var(--cyan); }
+  .option { display: flex; align-items: center; gap: 8px; margin-top: 6px; font-size: .8rem; color: #b9d6e5; }
+  .option input { accent-color: var(--cyan); }
+  #etapes { display: grid; grid-template-columns: repeat(4, 1fr); gap: 4px; margin-top: 11px; }
+  #etapes button { padding: 6px 2px; font-size: .72rem; background: #163c52; }
+  #etapes button.actif { color: #06202e; background: var(--cyan); font-weight: 700; }
+
+  #explication {
+    position: absolute; left: 14px; right: 14px; bottom: 12px; z-index: 4;
+    padding: 11px 15px; color: #e8f7ff;
+    background: rgba(6, 24, 36, .9); border-left: 4px solid var(--cyan);
+    border-radius: 10px; box-shadow: 0 10px 28px rgba(0,0,0,.35);
+    backdrop-filter: blur(8px);
+  }
+  #explication .ligne-titre { display: flex; align-items: center; gap: 10px; flex-wrap: wrap; }
+  #explication h2 { margin: 0; font-size: .97rem; color: #c9f1ff; }
+  .badge-doc {
+    font-size: .71rem; font-weight: 700; letter-spacing: .4px; padding: 2px 8px;
+    color: #062b25; background: #8ce6c4; border-radius: 999px;
+  }
+  #explication p { margin: 5px 0 0; font-size: .85rem; color: #c3dceb; line-height: 1.45; }
+  #eq-etape {
+    display: none; margin-top: 7px; padding: 5px 10px; width: fit-content;
+    font-family: Consolas, "Courier New", monospace; font-size: .86rem; font-weight: 700;
+    color: #ffe9a8; background: rgba(255, 216, 77, .1);
+    border: 1px solid rgba(255, 216, 77, .3); border-radius: 6px;
+  }
+  #eq-etape.visible { display: block; }
+
+  #info-objet {
+    display: none; position: absolute; z-index: 8; max-width: 280px; padding: 10px 12px;
+    color: #eaf7ff; pointer-events: none;
+    background: rgba(4, 20, 32, .97); border: 1px solid rgba(87, 215, 255, .5);
+    border-radius: 10px; box-shadow: 0 10px 26px rgba(0,0,0,.45);
+  }
+  #info-objet strong { display: block; margin-bottom: 4px; color: var(--cyan); font-size: .88rem; }
+  #info-objet span { font-size: .8rem; line-height: 1.4; color: #cee3f0; }
+
+  .etiquette-3d {
+    padding: 3px 7px; color: #fff; white-space: nowrap; pointer-events: none;
+    font-size: 11.5px; font-weight: 650; letter-spacing: .2px;
+    background: rgba(4, 20, 32, .82); border: 1px solid rgba(255,255,255,.2);
+    border-radius: 6px; text-shadow: 0 1px 2px #000;
+  }
+  .etiquette-3d.mito { border-color: rgba(255, 170, 90, .8); color: #ffd9ae; }
+  .etiquette-3d.noyau { border-color: rgba(190, 165, 255, .6); color: #ded2ff; }
+
+  #notes-modele {
+    flex: 0 0 auto; max-height: 152px; overflow-y: auto;
+    padding: 9px 22px; background: #e8f1ef; border-top: 1px solid var(--ligne);
+    font-size: .8rem; color: #405c65;
+  }
+  #notes-modele details { max-width: 1050px; margin: 0 auto; }
+  #notes-modele summary { cursor: pointer; font-weight: 700; color: var(--vert); }
+  #notes-modele ul { margin: 6px 0 4px 18px; padding: 0; }
+  #notes-modele li { margin-bottom: 2px; }
+
+  /* ----------------- fiches / documents ----------------- */
+  .fiche {
+    max-width: 1000px; margin: 0 auto; padding: 22px 26px 26px;
+    background: var(--carte); border: 1px solid var(--ligne); border-radius: 12px;
+    box-shadow: 0 6px 22px rgba(17, 94, 89, .07);
+  }
+  .fiche-top {
+    display: flex; justify-content: space-between; align-items: baseline; flex-wrap: wrap;
+    gap: 6px; border-bottom: 2px solid var(--vert); padding-bottom: 5px; margin-bottom: 12px;
+    font-size: .78rem; color: var(--gris);
+  }
+  .fiche-top strong { color: var(--vert); }
+  .identite { display: flex; flex-wrap: wrap; gap: 6px 16px; margin-bottom: 14px; font-size: .84rem; }
+  .identite label { display: flex; align-items: center; gap: 6px; }
+  .identite input {
+    border: 0; border-bottom: 1px solid #b7cbc7; background: #fbfdfc;
+    padding: 2px 5px; min-width: 130px; color: var(--encre);
+  }
+  .hero-fiche {
+    background: linear-gradient(120deg, #134e4a, #0d9488); color: #fff;
+    border-radius: 10px; padding: 12px 18px; margin-bottom: 14px;
+  }
+  .hero-fiche .kicker { opacity: .95; }
+  .hero-fiche h2 { margin: 3px 0; font-size: 1.55rem; line-height: 1.15; }
+  .hero-fiche .sub { font-size: .92rem; opacity: .96; }
+
+  .box { border-radius: 8px; padding: 9px 13px; margin: 9px 0 12px; break-inside: avoid; }
+  .box p:last-child { margin-bottom: 0; }
+  .context { background: #f0fdfa; border-left: 5px solid var(--vert3); }
+  .problem { background: #ecfdf5; border-left: 5px solid var(--vert); }
+  .vocab { background: #f5f3ff; border-left: 5px solid #6d28d9; }
+  .tip { background: #fffbeb; border: 1px dashed #d97706; }
+  .check { background: #f0fdf4; border-left: 5px solid #16a34a; }
+  .wonder { background: #eff6ff; border-left: 5px solid #2563eb; }
+  .note { background: #f8fafc; border: 1px solid #cbd5e1; }
+  .warn { background: #fef2f2; border-left: 5px solid #dc2626; }
+  .accent { color: var(--vert); font-weight: 700; }
+  .small { font-size: .83rem; color: var(--gris); }
+  .vocab-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 4px 14px; font-size: .81rem; line-height: 1.4; }
+  .vocab-grid p { margin: 0; }
+  .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+
+  .doc { border: 1.5px solid var(--vert); border-radius: 9px; margin: 14px 0 16px; overflow: hidden; break-inside: avoid; }
+  .doc-head {
+    display: flex; align-items: center; gap: 9px; padding: 7px 12px;
+    background: var(--vert); color: #fff;
+  }
+  .doc-num {
+    background: #fff; color: var(--vert); font-weight: 800; border-radius: 4px;
+    padding: 1px 7px; font-size: .83rem; white-space: nowrap;
+  }
+  .doc-head h3 { margin: 0; font-size: 1rem; line-height: 1.25; }
+  .doc-body { padding: 10px 13px 12px; }
+  .doc-body img { display: block; width: 100%; height: auto; border-radius: 5px; margin: 2px auto 8px; }
+  .doc-body img.doc1-img { width: 86%; }
+  .doc-body img.doc3-img { width: 78%; }
+  .legend {
+    font-size: .75rem; color: var(--gris); border-top: 1px solid #d7e3e0;
+    padding-top: 6px; margin-top: 9px; line-height: 1.4;
+  }
+  .legend strong { color: #243f47; }
+
+  table { width: 100%; border-collapse: collapse; font-size: .84rem; margin: 7px 0 4px; }
+  th { background: var(--vert); color: #fff; padding: 6px 8px; text-align: left; font-weight: 600; }
+  td { padding: 5px 8px; border-bottom: 1px solid #e5eeec; vertical-align: top; }
+  tr:nth-child(even) td { background: #f7fbfa; }
+  .blood td:not(:first-child), .blood th:not(:first-child) { text-align: center; font-weight: 600; }
+  .table-note { font-size: .75rem; color: var(--gris); margin-top: 3px; }
+  .center { text-align: center; }
+  .num { text-align: right; white-space: nowrap; }
+
+  .q {
+    display: flex; gap: 10px; margin: 10px 0 8px; padding: 9px 12px;
+    background: #f6fbfa; border-radius: 7px; border-left: 4px solid var(--vert3);
+    break-inside: avoid;
+  }
+  .q .n {
+    flex: 0 0 26px; height: 26px; border-radius: 50%; background: var(--vert);
+    color: #fff; font-weight: 800; font-size: .83rem;
+    display: flex; align-items: center; justify-content: center;
+  }
+  .q .txt { flex: 1; font-size: .9rem; }
+  .q-title { font-weight: 700; color: var(--vert); }
+  .q .meta { font-size: .76rem; color: var(--gris); font-style: italic; }
+  .q .pts { float: right; font-size: .76rem; color: #a16207; font-weight: 700; }
+
+  .zone-reponse { margin: 8px 0 4px; }
+  textarea.reponse {
+    display: block; width: 100%; min-height: 112px; resize: vertical;
+    padding: 9px 11px; color: #16343c; background:
+      repeating-linear-gradient(to bottom, #ffffff 0, #ffffff 25px, #e2efec 25px, #e2efec 26px);
+    border: 1px solid #c6dbd6; border-radius: 7px; line-height: 26px; font-size: .88rem;
+  }
+  textarea.reponse.longue { min-height: 300px; }
+  textarea.reponse:focus { outline: 3px solid rgba(245, 158, 11, .45); border-color: var(--vert3); }
+  .compteur { display: block; text-align: right; font-size: .73rem; color: var(--gris); margin-top: 2px; }
+  .impression-reponse { display: none; }
+
+  .aides { margin: 10px 0 4px; }
+  .aides summary { cursor: pointer; font-weight: 700; color: #92400e; font-size: .87rem; }
+  .niveau-aide { font-size: .82rem; margin: 6px 0 0 10px; }
+  .niveau-aide strong { color: var(--vert); }
+
+  .check-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 4px 14px; font-size: .82rem; }
+  .check-grid label { display: flex; gap: 7px; align-items: flex-start; }
+  .check-grid input { accent-color: var(--vert); margin-top: 3px; }
+
+  .actions-fiche {
+    display: flex; flex-wrap: wrap; gap: 8px; align-items: center;
+    margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--ligne);
+  }
+  .actions-fiche button {
+    padding: 8px 13px; color: #fff; background: var(--vert2);
+    border: 0; border-radius: 8px; font-size: .82rem; font-weight: 600;
+  }
+  .actions-fiche button:hover { background: var(--vert); }
+  .actions-fiche button.secondaire { color: var(--vert); background: #e7f5f1; border: 1px solid #bcded5; }
+  .actions-fiche button.secondaire:hover { background: #d5ede6; }
+  #etat-sauvegarde { font-size: .77rem; color: var(--gris); margin-left: auto; }
+
+  /* ----------------- bilan ----------------- */
+  .bilan-intro { font-size: .92rem; }
+  .exercice-bilan { background: #fff; border: 1px solid var(--ligne); border-radius: 10px; padding: 14px 17px; margin: 12px 0; }
+  .exercice-bilan h3 { color: var(--vert); font-size: 1rem; margin-bottom: 4px; }
+  .phrase-bilan { margin: 9px 0; font-size: .93rem; line-height: 2.1; }
+  .phrase-bilan select {
+    padding: 3px 6px; margin: 0 2px; border: 1px solid #b9d3cd; border-radius: 6px;
+    background: #f3fbf9; color: var(--vert); font-weight: 700; font-size: .86rem;
+  }
+  .phrase-bilan select.bon { background: #dcfce7; border-color: #16a34a; color: #14532d; }
+  .phrase-bilan select.faux { background: #fee2e2; border-color: #dc2626; color: #7f1d1d; }
+  #resultat-bilan { margin: 10px 0 0; font-weight: 700; font-size: .9rem; }
+  #trace-ecrite { display: none; margin-top: 14px; }
+  #trace-ecrite.visible { display: block; }
+  .eq {
+    font-family: Consolas, "Courier New", monospace; font-weight: 700; color: var(--vert);
+    background: #e7f5f1; padding: 8px 12px; border-radius: 7px; display: inline-block;
+  }
+  .comparatif td:first-child { font-weight: 700; color: var(--vert); width: 26%; }
+
+  .secret { display: none; }
+  .secret.visible { display: block; }
+  .accroche-secret {
+    display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 10px;
+    padding: 13px 16px; margin: 14px 0; border: 1px dashed #b9a06a; border-radius: 9px;
+    background: #fffbeb; font-size: .88rem;
+  }
+  .accroche-secret button {
+    padding: 7px 13px; color: #fff; background: #a16207; border: 0; border-radius: 8px; font-weight: 650;
+  }
+  .accroche-secret button:hover { background: #854d0e; }
+  .qtitle { font-weight: 700; color: var(--vert); margin: 14px 0 3px; }
+  .answer { margin: 0 0 8px; padding-left: 12px; border-left: 2px solid #cbd5e1; font-size: .88rem; }
+  .bareme { font-size: .8rem; color: #374151; background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 6px; padding: 6px 9px; margin: 5px 0 9px; }
+  .pill { display: inline-block; background: #e6f6f2; color: var(--vert); border: 1px solid #9dd9cc; border-radius: 999px; padding: 1px 8px; font-size: .76rem; margin: 2px; }
+
+  /* ----------------- envoi de la copie / config Sheets ----------------- */
+  .envoi-copie { background: #eff6ff; border: 1px solid #bfdbfe; border-left: 5px solid #2563eb; }
+  .envoi-copie h4 { margin: 0 0 5px; color: #1d4ed8; font-size: .93rem; }
+  .envoi-copie p { margin: 0 0 9px; font-size: .82rem; color: #334155; }
+  .envoi-ligne { display: flex; flex-wrap: wrap; gap: 9px; align-items: center; }
+  .envoi-ligne button, #confirmation-envoi button, .config-prof button {
+    padding: 8px 14px; color: #fff; background: #1d4ed8; border: 0;
+    border-radius: 8px; font-size: .82rem; font-weight: 650;
+  }
+  .envoi-ligne button:hover, #confirmation-envoi button:hover,
+  .config-prof button:hover { background: #1e40af; }
+  .envoi-ligne button.secondaire, #confirmation-envoi button.secondaire,
+  .config-prof button.secondaire { color: #1d4ed8; background: #e8f0fe; border: 1px solid #b6cdf7; }
+  .envoi-ligne button:disabled { opacity: .55; cursor: not-allowed; }
+  #etat-envoi { font-size: .8rem; color: #334155; }
+  #etat-envoi.succes { color: #15803d; font-weight: 650; }
+  #etat-envoi.erreur { color: #b91c1c; font-weight: 650; }
+  #confirmation-envoi {
+    display: none; margin-top: 11px; padding: 10px 13px; background: #fff;
+    border: 1px solid #93c5fd; border-radius: 8px; font-size: .83rem;
+  }
+  #confirmation-envoi.visible { display: block; }
+  #confirmation-envoi ul { margin: 6px 0 11px 18px; font-size: .81rem; }
+  .config-prof label { display: block; font-size: .82rem; margin: 7px 0 3px; font-weight: 650; }
+  .config-prof input[type="text"] {
+    width: 100%; padding: 7px 9px; border: 1px solid #b9d3cd;
+    border-radius: 7px; font-size: .82rem; font-family: Consolas, "Courier New", monospace;
+  }
+  .config-prof .rang { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 10px; }
+  #cfg-etat { font-size: .8rem; margin-top: 8px; color: var(--gris); }
+  #cfg-etat.succes { color: #15803d; font-weight: 650; }
+  #cfg-etat.erreur { color: #b91c1c; font-weight: 650; }
+  #code-gs {
+    display: block; width: 100%; height: 150px; margin-top: 8px; padding: 8px;
+    font-family: Consolas, "Courier New", monospace; font-size: .72rem;
+    border: 1px solid #cbd5e1; border-radius: 7px; background: #f8fafc; color: #334155;
+  }
+  .tableau-analyse { width: 100%; border-collapse: collapse; font-size: .8rem; margin: 8px 0; }
+  .tableau-analyse th { background: var(--vert); color: #fff; padding: 5px 7px; text-align: left; }
+  .tableau-analyse td { padding: 4px 7px; border-bottom: 1px solid var(--ligne); }
+  .niveau-ts { color: #15803d; font-weight: 700; }
+  .niveau-s  { color: #65a30d; font-weight: 700; }
+  .niveau-f  { color: #b45309; font-weight: 700; }
+  .niveau-i  { color: #b91c1c; font-weight: 700; }
+
+  /* ----------------- verrou ----------------- */
+  #verrou {
+    display: none; position: fixed; inset: 0; z-index: 50;
+    align-items: center; justify-content: center; background: rgba(6, 26, 38, .88);
+    padding: 20px;
+  }
+  #verrou.visible { display: flex; }
+  .carte-verrou {
+    width: min(390px, 100%); padding: 26px 28px; text-align: center;
+    background: #fff; border: 1px solid #cfe3de; border-radius: 16px;
+    box-shadow: 0 24px 70px rgba(0,0,0,.45);
+  }
+  .carte-verrou .cadenas { font-size: 2rem; }
+  .carte-verrou h2 { margin: 6px 0; font-size: 1.15rem; color: var(--vert); }
+  .carte-verrou p { font-size: .85rem; color: var(--gris); margin-bottom: 16px; }
+  .carte-verrou input {
+    width: 100%; padding: 10px; text-align: center; letter-spacing: 8px;
+    font-size: 1.2rem; border: 1px solid #a9c9c1; border-radius: 8px;
+    background: #f6fbf9; color: var(--encre); margin-bottom: 12px;
+  }
+  .carte-verrou button {
+    width: 100%; padding: 10px; color: #fff; background: var(--vert2);
+    border: 0; border-radius: 8px; font-weight: 650;
+  }
+  .carte-verrou button:hover { background: var(--vert); }
+  .carte-verrou button.annuler { margin-top: 9px; color: var(--gris); background: transparent; border: 1px solid #cbd5d1; }
+  #erreur-verrou { display: none; color: #b91c1c; font-size: .82rem; margin-top: 8px; }
+
+  /* ----------------- responsive ----------------- */
+  @media (max-width: 820px) {
+    header { padding: 9px 14px; }
+    .entete-actions .badge-horsligne { display: none; }
+    .panneau { padding: 14px 12px 24px; }
+    .fiche { padding: 15px 14px 20px; }
+    .vocab-grid { grid-template-columns: 1fr 1fr; }
+    .grid-2, .check-grid { grid-template-columns: 1fr; }
+    #commandes { width: 234px; padding: 10px; top: 9px; right: 9px; }
+    #explication { left: 9px; right: 9px; bottom: 9px; padding: 9px 11px; }
+    #explication p { font-size: .78rem; }
+    #notes-modele { padding: 7px 12px; max-height: 110px; }
+    footer .credits { display: none; }
+  }
+  @media (max-width: 520px) {
+    #commandes { width: calc(100% - 18px); max-height: 210px; overflow-y: auto; }
+    #explication { bottom: 9px; }
+    #explication p { max-height: 62px; overflow-y: auto; }
+  }
+
+  /* ----------------- impression : toujours la fiche élève ----------------- */
+  @media print {
+    @page { size: A4; margin: 10mm 12mm 12mm; }
+    html, body { height: auto; background: #fff; font-size: 10pt; }
+    #app { display: block; height: auto; overflow: visible; }
+    header { padding: 0 0 6px; background: #fff !important; color: var(--vert); box-shadow: none; }
+    header h1 { color: var(--vert); font-size: 15pt; }
+    header .kicker, header .soustitre { color: var(--gris); opacity: 1; }
+    #onglets, footer, #notes-modele, #zone3d, #verrou, .no-print,
+    .entete-actions, .actions-fiche, .aides, .compteur { display: none !important; }
+    #panneaux { display: block !important; height: auto !important; overflow: visible !important; }
+    .panneau { display: none !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
+    #panneau-activite { display: block !important; }
+    .fiche { max-width: none; padding: 0; border: 0; box-shadow: none; }
+    .hero-fiche { background: #e6f5f1 !important; color: var(--vert) !important; }
+    .hero-fiche .sub, .hero-fiche .kicker { color: var(--vert) !important; }
+    .box, .doc, .q, .zone-reponse { break-inside: avoid; }
+    .page-break { break-before: page; }
+    textarea.reponse { display: none !important; }
+    .impression-reponse {
+      display: block !important; white-space: pre-wrap; min-height: 70px;
+      padding: 4px 6px; border: 1px solid #b9cbc7; border-radius: 5px;
+      font-size: 9.5pt; line-height: 1.5; color: #16343c;
+    }
+    .impression-reponse.longue { min-height: 235px; }
+    .identite input { border: 0; border-bottom: 1px solid #999; background: #fff; }
+    a { color: var(--vert); text-decoration: none; }
+  }
+</style>
+</head>
+<body>
+
+<div id="app">
+
+  <header>
+    <div>
+      <div class="kicker">SVT · 3<sup>e</sup> · Cycle 4 — Le corps humain et la santé</div>
+      <h1>L’énergie des muscles <span>— la respiration cellulaire</span></h1>
+      <p class="soustitre">Activité d’investigation · 55 min · 20 points · trois documents, trois questions</p>
+    </div>
+    <div class="entete-actions no-print">
+      <span class="badge-horsligne">● Fichier unique · fonctionne hors ligne</span>
+      <button type="button" id="btn-imprimer">🖨 Imprimer la fiche élève</button>
+    </div>
+  </header>
+
+  <nav id="onglets" aria-label="Navigation de l’activité">
+    <button type="button" class="onglet actif" data-onglet="3d">Modélisation 3D</button>
+    <button type="button" class="onglet" data-onglet="activite">Activité élève</button>
+    <button type="button" class="onglet" data-onglet="bilan">Bilan &amp; corrigé</button>
+    <button type="button" class="onglet" data-onglet="prof">Fiche professeur 🔒</button>
+  </nav>
+
+  <main id="panneaux">
+
+    <!-- ======================= ONGLET 1 : MODÉLISATION 3D ======================= -->
+    <section id="panneau-3d" class="panneau actif" aria-label="Modélisation 3D">
+      <div id="zone3d">
+        <div id="scene" aria-label="Cellule musculaire en 3D : la mitochondrie est le seul organite actif"></div>
+        <div id="secours3d">
+          <div>
+            <strong>La scène 3D ne peut pas s’afficher ici.</strong><br>
+            Le navigateur refuse WebGL (matériel ou pilote indisponible). L’activité, les documents et le bilan
+            restent utilisables dans les autres onglets.
+          </div>
+        </div>
+
+        <aside id="commandes" class="no-print" aria-label="Commandes de l’animation">
+          <h2>Explorer la modélisation</h2>
+          <div class="rangee">
+            <button type="button" id="lecture">⏸ Pause</button>
+            <button type="button" id="recommencer">↺ Recommencer</button>
+          </div>
+          <div class="rangee">
+            <button type="button" id="vue-mito">🔍 Zoom mitochondrie</button>
+            <button type="button" id="vue-cellule">↩ Ensemble</button>
+          </div>
+          <div class="reglage">
+            <label for="vitesse">Vitesse</label>
+            <input id="vitesse" type="range" min="0.4" max="2" step="0.1" value="1">
+            <span id="valeur-vitesse">×1</span>
+          </div>
+          <div class="reglage">
+            <label for="progression">Étapes</label>
+            <input id="progression" type="range" min="0" max="1000" value="0">
+            <span></span>
+          </div>
+          <div class="option"><input id="etiquettes" type="checkbox" checked><label for="etiquettes">Afficher les étiquettes</label></div>
+          <div class="option"><input id="rotation" type="checkbox"><label for="rotation">Rotation de la caméra</label></div>
+          <div id="etapes" aria-label="Accès direct aux étapes">
+            <button type="button" data-temps="0">1. Apports</button>
+            <button type="button" data-temps="4.2">2. Entrée</button>
+            <button type="button" data-temps="8.2">3. Réaction</button>
+            <button type="button" data-temps="14.6">4. Énergie</button>
+          </div>
+        </aside>
+
+        <div id="explication" class="no-print" aria-live="polite">
+          <div class="ligne-titre">
+            <h2 id="titre-etape"></h2>
+            <span class="badge-doc" id="doc-etape"></span>
+          </div>
+          <p id="texte-etape"></p>
+          <div id="eq-etape"></div>
+        </div>
+
+        <div id="info-objet" role="status"></div>
+      </div>
+
+      <div id="notes-modele" class="no-print">
+        <details>
+          <summary>Ce que le modèle montre… et ce qu’il simplifie (à lire avant de projeter)</summary>
+          <ul>
+            <li><strong>Seule la mitochondrie réagit.</strong> La membrane plasmique, le cytoplasme et le noyau restent strictement immobiles et inchangés du début à la fin : le noyau ne participe pas à la respiration cellulaire.</li>
+            <li><strong>Les réactifs entrent, les déchets sortent, l’énergie reste.</strong> Le glucose et les 6 molécules de dioxygène franchissent la membrane ; les 6 CO₂ et les 6 H₂O produits la retraversent vers le sang ; l’énergie (ATP) diffuse dans le cytoplasme sans quitter la cellule.</li>
+            <li><strong>Simplifications :</strong> une cellule musculaire est allongée, non sphérique ; la mitochondrie est très agrandie ; la réaction réelle comporte de nombreuses étapes enzymatiques, dont la première (glycolyse) dans le cytoplasme — le modèle les regroupe dans la mitochondrie, lieu de l’essentiel de la respiration cellulaire.</li>
+            <li><strong>Non représentés :</strong> le sang, les capillaires et le cœur (documents 1 et 3), la chaleur produite, la respiration pulmonaire. Aucune valeur numérique n’est inventée : toutes sont celles des documents.</li>
+            <li><strong>Équation représentée :</strong> C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O + énergie. Couleurs : carbone gris, oxygène rouge, hydrogène blanc, énergie dorée.</li>
+          </ul>
+        </details>
+      </div>
+    </section>
+
+    <!-- ======================= ONGLET 2 : ACTIVITÉ ÉLÈVE ======================= -->
+    <section id="panneau-activite" class="panneau" aria-label="Activité élève">
+      <article class="fiche">
+
+        <div class="fiche-top">
+          <div><strong>SVT · 3<sup>e</sup> · Cycle 4</strong> — Le corps humain et la santé</div>
+          <div>Activité d’investigation · 55 min · 20 points</div>
+        </div>
+
+        <div class="identite">
+          <label>Nom : <input type="text" id="nom" data-sauvegarde placeholder="………………"></label>
+          <label>Prénom : <input type="text" id="prenom" data-sauvegarde placeholder="………………"></label>
+          <label>Classe : <input type="text" id="classe" data-sauvegarde placeholder="………" style="min-width:80px"></label>
+        </div>
+
+        <div class="hero-fiche">
+          <div class="kicker">Enquête scientifique · respiration et énergie</div>
+          <h2>L’énergie des muscles</h2>
+          <div class="sub">La respiration cellulaire — SVT 3<sup>e</sup></div>
+        </div>
+
+        <div class="box context">
+          <p>Lors d’un test sur tapis roulant, <strong>monsieur X</strong> enchaîne une course de plusieurs minutes. Son rythme cardiaque passe de <strong>70 battements par minute</strong> au repos à <strong>180 pendant l’effort</strong>. Ses muscles travaillent, mais <strong>d’où vient l’énergie</strong> qu’ils utilisent ?</p>
+        </div>
+
+        <div class="box problem">
+          <p><strong>Problème :</strong> comment les cellules musculaires se procurent-elles l’énergie nécessaire à un effort physique ?</p>
+          <p><strong>Votre mission :</strong> vous préparez une fiche pour le club de course du collège. Répondez aux trois questions : montrez ce que le muscle prélève et rejette (Q1), expliquez ce que deviennent le glucose et le dioxygène (Q2), puis rédigez une réponse organisée sur l’énergie du muscle (Q3, 10 à 15 lignes).</p>
+        </div>
+
+        <div class="box vocab">
+          <p class="accent" style="margin-bottom:5px">Les mots pour comprendre</p>
+          <div class="vocab-grid">
+            <p><strong>Respiration cellulaire :</strong> réaction chimique qui libère de l’énergie à partir de glucose et de dioxygène.</p>
+            <p><strong>Glucose :</strong> nutriment qui fournit de l’énergie aux cellules.</p>
+            <p><strong>Dioxygène (O₂) :</strong> gaz prélevé dans l’air, transporté par le sang.</p>
+            <p><strong>Dioxyde de carbone (CO₂) :</strong> déchet produit par la respiration cellulaire.</p>
+            <p><strong>Nutriment :</strong> molécule issue de la digestion, utilisée par les cellules.</p>
+            <p><strong>Énergie :</strong> ce qui permet à la cellule de fonctionner et au muscle de se contracter.</p>
+          </div>
+        </div>
+
+        <!-- DOCUMENT 1 -->
+        <div class="doc">
+          <div class="doc-head"><span class="doc-num">DOC 1</span><h3>Le muscle consomme et rejette des molécules</h3></div>
+          <div class="doc-body">
+            <img class="doc1-img" src="__IMG_DOC1__" alt="Coupe de muscle avant et après un effort : les réserves glucidiques, colorées en rose avant l’effort, ont presque disparu après quelques minutes d’effort.">
+            <p>Avant l’effort, les <strong>réserves glucidiques</strong> des fibres musculaires sont abondantes : elles apparaissent en rose. Après quelques minutes d’effort, la coloration rose a presque disparu : le muscle a consommé du <strong>glucose</strong>. Le tableau compare le sang qui entre dans le muscle et celui qui en sort.</p>
+            <table class="blood">
+              <tr>
+                <th style="width:46%">Molécule mesurée dans le sang</th>
+                <th style="width:27%">Sang entrant<br>(pour 1 L)</th>
+                <th style="width:27%">Sang sortant<br>(pour 1 L)</th>
+              </tr>
+              <tr><td>Dioxygène (mL)</td><td>200</td><td>150</td></tr>
+              <tr><td>Dioxyde de carbone (mL)</td><td>490</td><td>560</td></tr>
+              <tr><td>Glucose (mg)</td><td>900</td><td>800</td></tr>
+            </table>
+            <div class="legend"><strong>Doc. 1 —</strong> Coupe de muscle avant (à gauche) et après quelques minutes d’effort (à droite) : les réserves glucidiques sont en rose, les noyaux en noir. Tableau : composition du sang entrant et sortant d’un muscle, pour 1 L de sang. Source : Lelivrescolaire.fr, SVT 3e, 2017 ; micrographie J.L. Kemeny/ISM.</div>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="n">1</div>
+          <div class="txt">
+            <span class="q-title">Question 1 — Comparer et interpréter</span>
+            <span class="pts">4 points · D4.2</span><br>
+            À l’aide du document 1, compare le sang entrant et le sang sortant du muscle. Indique quelles molécules le muscle prélève et quelle molécule il rejette. Justifie la réponse avec des valeurs.
+          </div>
+        </div>
+        <div class="zone-reponse">
+          <textarea class="reponse" id="q1" data-sauvegarde data-lignes="q1" placeholder="Compare les trois lignes du tableau avec les valeurs et les unités…"></textarea>
+          <span class="compteur" data-compteur="q1">0 ligne</span>
+        </div>
+
+        <!-- DOCUMENT 2 -->
+        <div class="doc page-break">
+          <div class="doc-head"><span class="doc-num">DOC 2</span><h3>Ce que deviennent le glucose et le dioxygène dans la cellule</h3></div>
+          <div class="doc-body">
+            <p>Pour savoir ce que la cellule fait du glucose et du dioxygène, des chercheurs ont suivi des <strong>atomes marqués</strong>. Le carbone du glucose se retrouve dans le dioxyde de carbone. L’oxygène du dioxygène se retrouve dans l’eau. La cellule a donc transformé ces molécules : c’est la <strong>respiration cellulaire</strong>.</p>
+            <table>
+              <tr>
+                <th style="width:30%">Atome marqué</th>
+                <th style="width:35%">Molécule marquée obtenue après quelques minutes</th>
+                <th style="width:35%">Molécule marquée obtenue après 1 heure</th>
+              </tr>
+              <tr><td>Carbone du glucose</td><td>Dioxyde de carbone</td><td>Dioxyde de carbone</td></tr>
+              <tr><td>Oxygène du dioxygène</td><td>Eau</td><td>Eau</td></tr>
+            </table>
+            <div class="legend"><strong>Doc. 2 —</strong> Devenir des atomes marqués du glucose et du dioxygène dans une cellule musculaire, après quelques minutes et après 1 heure. Source : Lelivrescolaire.fr, SVT 3e, 2017.</div>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="n">2</div>
+          <div class="txt">
+            <span class="q-title">Question 2 — Expliquer et modéliser</span>
+            <span class="pts">6 points · D4.1</span><br>
+            À l’aide du document 2, explique ce que deviennent le glucose et le dioxygène dans la cellule musculaire. Écris ensuite le <strong>bilan de la respiration cellulaire</strong> en précisant ce qui est consommé, ce qui est produit et ce qui est libéré.
+          </div>
+        </div>
+        <div class="zone-reponse">
+          <textarea class="reponse" id="q2" data-sauvegarde data-lignes="q2" placeholder="Suis chaque atome marqué, puis écris le bilan sous forme d’équation…"></textarea>
+          <span class="compteur" data-compteur="q2">0 ligne</span>
+        </div>
+
+        <details class="aides no-print">
+          <summary>Besoin d’un coup de pouce ? Choisis le niveau indiqué par ton professeur</summary>
+          <p class="niveau-aide"><strong>Niveau 1 — Méthode :</strong> lis le tableau ligne par ligne. Pour chaque atome marqué, demande-toi dans quelle molécule on le retrouve après quelques minutes, puis après 1 heure.</p>
+          <p class="niveau-aide"><strong>Niveau 2 — Indice :</strong> le carbone du glucose se retrouve dans le dioxyde de carbone ; l’oxygène du dioxygène se retrouve dans l’eau. Que reste-t-il à placer dans le bilan ?</p>
+          <p class="niveau-aide"><strong>Niveau 3 — Notion :</strong> la respiration cellulaire est une réaction chimique : glucose + dioxygène → dioxyde de carbone + eau + énergie. Elle se déroule dans les cellules, pas dans les poumons.</p>
+        </details>
+
+        <!-- DOCUMENT 3 -->
+        <div class="doc page-break">
+          <div class="doc-head"><span class="doc-num">DOC 3</span><h3>Le rythme cardiaque pendant l’effort</h3></div>
+          <div class="doc-body">
+            <img class="doc3-img" src="__IMG_DOC3__" alt="Graphique du rythme cardiaque de monsieur X : 70 battements par minute au repos, une montée jusqu’à 180 pendant l’effort, puis un retour progressif vers 120 après l’arrêt.">
+            <p>Le <strong>rythme cardiaque</strong> est le nombre de battements du cœur par minute. Au repos, il est de <strong>70 battements par minute</strong>. Dès le début de l’effort (2<sup>e</sup> minute), il augmente et atteint <strong>180 battements par minute</strong> après 3 minutes d’effort. Il reste à ce niveau pendant l’effort, puis redescend après l’arrêt.</p>
+            <div class="legend"><strong>Doc. 3 —</strong> Évolution du rythme cardiaque de monsieur X lors d’une course sur tapis roulant. Source : DNB 2018, session de remplacement, sujet 18GENSCMEAG3.</div>
+          </div>
+        </div>
+
+        <div class="q">
+          <div class="n">3</div>
+          <div class="txt">
+            <span class="q-title">Question 3 — Rédiger</span>
+            <span class="pts">8 points + 2 points de maîtrise de la langue · D1.3</span><br>
+            À l’aide des <strong>documents 1, 2 et 3</strong>, rédige une réponse organisée de <strong>10 à 15 lignes</strong> expliquant comment les cellules musculaires disposent de l’énergie nécessaire pendant un effort. Utilise les mots : <strong>respiration cellulaire, glucose, dioxygène, sang, énergie</strong>.
+          </div>
+        </div>
+        <div class="zone-reponse">
+          <textarea class="reponse longue" id="q3" data-sauvegarde data-lignes="q3" placeholder="D’abord… Ensuite… Enfin… (10 à 15 lignes)"></textarea>
+          <span class="compteur" data-compteur="q3">0 ligne</span>
+        </div>
+
+        <div class="box wonder">
+          <p class="accent" style="margin-bottom:2px">Le saviez-vous ?</p>
+          <p class="small" style="margin-bottom:0">Chez un humain, l’ensemble des <strong>capillaires sanguins</strong> mesure environ <strong>100 000 km</strong> de long. C’est le réseau qui permet au sang d’arriver au plus près de chaque cellule.</p>
+        </div>
+
+        <div class="box check">
+          <p class="accent" style="margin-bottom:3px">Avant de rendre</p>
+          <div class="check-grid small">
+            <label><input type="checkbox" id="c1" data-sauvegarde><span>J’ai répondu aux <strong>trois questions</strong>.</span></label>
+            <label><input type="checkbox" id="c2" data-sauvegarde><span>J’ai utilisé les mots <strong>respiration cellulaire, glucose, dioxygène, sang, énergie</strong>.</span></label>
+            <label><input type="checkbox" id="c3" data-sauvegarde><span>J’ai cité au moins une valeur d’un document.</span></label>
+            <label><input type="checkbox" id="c4" data-sauvegarde><span>J’ai relu l’orthographe et la ponctuation.</span></label>
+          </div>
+        </div>
+
+        <div class="box envoi-copie no-print" id="bloc-envoi">
+          <h4>📤 Envoyer ma copie au professeur</h4>
+          <p><strong>Aucun compte, aucune inscription, aucune plateforme.</strong> Seuls ton nom, ton prénom, ta classe et tes réponses sont transmis. L’envoi demande une connexion internet ; tout le reste de l’application fonctionne hors ligne.</p>
+          <div class="envoi-ligne">
+            <button type="button" id="btn-envoyer">📤 Envoyer ma copie</button>
+            <button type="button" id="btn-nouvelle-copie" class="secondaire" style="display:none">🧹 Nouvelle copie</button>
+            <span id="etat-envoi" role="status" aria-live="polite"></span>
+          </div>
+          <div id="confirmation-envoi">
+            <p class="accent" style="margin-bottom:4px">Vérifie avant d’envoyer</p>
+            <ul>
+              <li><strong id="conf-nom">…</strong> · <strong id="conf-prenom">…</strong> · <strong id="conf-classe">…</strong></li>
+              <li>Les réponses Q1, Q2, Q3, le score du bilan et l’analyse par compétences.</li>
+              <li>Aucune adresse mail, aucun mot de passe, aucune donnée de l’appareil, aucun suivi de connexion.</li>
+            </ul>
+            <button type="button" id="btn-confirmer-envoi">Confirmer l’envoi</button>
+            <button type="button" id="btn-annuler-envoi" class="secondaire">Annuler</button>
+          </div>
+        </div>
+
+        <div class="actions-fiche no-print">
+          <button type="button" id="btn-export">⬇ Exporter ma copie (.txt)</button>
+          <button type="button" id="btn-imprimer-2">🖨 Imprimer</button>
+          <button type="button" id="btn-effacer" class="secondaire">Effacer mes réponses</button>
+          <span id="etat-sauvegarde">Sauvegarde automatique activée</span>
+        </div>
+
+      </article>
+    </section>
+
+    <!-- ======================= ONGLET 3 : BILAN ======================= -->
+    <section id="panneau-bilan" class="panneau" aria-label="Bilan et corrigé">
+      <article class="fiche">
+        <div class="fiche-top"><div><strong>Bilan</strong> — Ce que l’activité permet d’établir</div><div>3<sup>e</sup> · Cycle 4</div></div>
+
+        <div class="hero-fiche">
+          <div class="kicker">Trace écrite · question 2</div>
+          <h2>Le bilan de la respiration cellulaire</h2>
+          <div class="sub">Complète le bilan, puis compare-le avec la correction attendue.</div>
+        </div>
+
+        <p class="bilan-intro">Les documents 1 et 2 montrent que le muscle <strong>prélève</strong> du glucose et du dioxygène et <strong>rejette</strong> du dioxyde de carbone. Le document 2 précise que le carbone du glucose se retrouve dans le CO₂ et l’oxygène du dioxygène dans l’eau. La réaction libère de l’énergie utilisée par la cellule.</p>
+
+        <div class="exercice-bilan">
+          <h3>À toi de compléter le bilan</h3>
+          <p class="small">Choisis la bonne réponse dans chaque liste, puis clique sur « Vérifier ».</p>
+
+          <p class="phrase-bilan">Dans la cellule musculaire,
+            <select id="b1" aria-label="Réactif 1"><option value="">… ? …</option><option value="glucose">glucose</option><option value="co2">dioxyde de carbone</option><option value="eau">eau</option><option value="sang">sang</option></select>
+            réagit avec le
+            <select id="b2" aria-label="Réactif 2"><option value="">… ? …</option><option value="dioxygene">dioxygène</option><option value="co2">dioxyde de carbone</option><option value="eau">eau</option><option value="glucose">glucose</option></select>.
+          </p>
+          <p class="phrase-bilan">Cette réaction produit du
+            <select id="b3" aria-label="Produit 1"><option value="">… ? …</option><option value="co2">dioxyde de carbone</option><option value="glucose">glucose</option><option value="dioxygene">dioxygène</option><option value="energie">énergie</option></select>
+            et de l’
+            <select id="b4" aria-label="Produit 2"><option value="">… ? …</option><option value="eau">eau</option><option value="co2">dioxyde de carbone</option><option value="dioxygene">dioxygène</option><option value="sang">sang</option></select>,
+            et elle libère de l’
+            <select id="b5" aria-label="Énergie"><option value="">… ? …</option><option value="energie">énergie</option><option value="eau">eau</option><option value="co2">dioxyde de carbone</option><option value="chaleur-seule">chaleur uniquement</option></select>.
+          </p>
+          <p class="phrase-bilan">Elle se déroule
+            <select id="b6" aria-label="Lieu"><option value="">… ? …</option><option value="cellules">dans les cellules</option><option value="poumons">dans les poumons</option><option value="sang">dans le sang</option><option value="estomac">dans l’estomac</option></select>,
+            et le sang
+            <select id="b7" aria-label="Rôle du sang"><option value="">… ? …</option><option value="transport">transporte les réactifs et les déchets</option><option value="fabrique">fabrique l’énergie</option><option value="rien">ne joue aucun rôle</option></select>.
+          </p>
+
+          <button type="button" id="btn-verifier-bilan" style="padding:8px 16px;color:#fff;background:var(--vert2);border:0;border-radius:8px;font-weight:650">Vérifier</button>
+          <button type="button" id="btn-reset-bilan" class="secondaire" style="padding:8px 13px;color:var(--vert);background:#e7f5f1;border:1px solid #bcded5;border-radius:8px;margin-left:6px">Recommencer</button>
+          <p id="resultat-bilan" role="status"></p>
+        </div>
+
+        <div id="trace-ecrite">
+          <div class="box check">
+            <p class="accent" style="margin-bottom:4px">Bilan à retenir</p>
+            <p class="eq">glucose + dioxygène → dioxyde de carbone + eau + énergie</p>
+            <p style="margin:9px 0 0">La <strong>respiration cellulaire</strong> est une réaction chimique qui se déroule <strong>dans les cellules</strong> (essentiellement dans les mitochondries). Elle consomme du <strong>glucose</strong> et du <strong>dioxygène</strong>, produit du <strong>dioxyde de carbone</strong> et de l’<strong>eau</strong>, et libère de l’<strong>énergie</strong> utilisable par la cellule — ainsi que de la chaleur. Le <strong>sang</strong> apporte les réactifs et emporte les déchets : il ne fabrique pas l’énergie.</p>
+            <p class="small" style="margin:6px 0 0">Équation équilibrée (référence, non exigée en 3<sup>e</sup>) : C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O + énergie.</p>
+          </div>
+        </div>
+
+        <h3 style="color:var(--vert);margin-top:20px">Ne pas confondre</h3>
+        <table class="comparatif">
+          <tr><th>Distinction</th><th>Respiration pulmonaire</th><th>Respiration cellulaire</th></tr>
+          <tr><td>Où ?</td><td>Dans les poumons</td><td>Dans les cellules (mitochondries)</td></tr>
+          <tr><td>Quoi ?</td><td>Échanges de gaz entre l’air et le sang</td><td>Réaction chimique entre glucose et dioxygène</td></tr>
+          <tr><td>Résultat</td><td>Le sang se charge en O₂ et se débarrasse du CO₂</td><td>Production de CO₂, d’eau et d’énergie</td></tr>
+        </table>
+
+        <div class="accroche-secret no-print" id="accroche-corrige">
+          <span>🔒 <strong>Corrigé détaillé, barème et grilles d’évaluation</strong> — réservé à l’équipe enseignante.</span>
+          <button type="button" data-deverrouiller="corrige">Déverrouiller (code)</button>
+        </div>
+
+        <div id="zone-corrige" class="secret"></div>
+      </article>
+
+      <template id="tpl-corrige">
+        <h3 style="color:var(--vert);margin-top:18px">Correction détaillée — 20 points</h3>
+
+        <div class="qtitle">Question 1 — Comparer et interpréter (4 points) — D4.2</div>
+        <div class="answer">
+          <p><strong>Comparaison des valeurs (2 pts) :</strong> le dioxygène passe de <strong>200 à 150 mL</strong> par litre de sang : le muscle en prélève <strong>50 mL</strong>. Le glucose passe de <strong>900 à 800 mg</strong> par litre de sang : le muscle en prélève <strong>100 mg</strong>. Le dioxyde de carbone passe de <strong>490 à 560 mL</strong> par litre de sang : le muscle en rejette <strong>70 mL</strong>.</p>
+          <p><strong>Interprétation (2 pts) :</strong> le muscle <strong>prélève du dioxygène et du glucose</strong> dans le sang et <strong>rejette du dioxyde de carbone</strong>. Le glucose et le dioxygène sont donc des molécules consommées par le muscle ; le dioxyde de carbone est un déchet produit par son fonctionnement.</p>
+        </div>
+        <div class="bareme"><strong>Barème :</strong> 2 pts pour la comparaison chiffrée des trois lignes (au moins deux valeurs avec unités) ; 2 pts pour l’identification correcte des molécules prélevées et rejetées. Retirer 0,5 pt si les unités sont absentes ou confondues.</div>
+        <p class="small"><strong>Erreurs fréquentes :</strong> inverser le sens de lecture (croire que le sang sortant apporte le dioxygène) ; dire que le muscle « produit » du glucose ; oublier de préciser que le dioxyde de carbone augmente. Accepter « le muscle consomme de l’oxygène » si le vocabulaire exact « dioxygène » est ensuite utilisé.</p>
+
+        <div class="qtitle">Question 2 — Expliquer et modéliser (6 points) — D4.1</div>
+        <div class="answer">
+          <p><strong>Devenir du glucose (2 pts) :</strong> le <strong>carbone du glucose</strong> se retrouve dans le <strong>dioxyde de carbone</strong>. Le glucose est donc transformé en dioxyde de carbone.</p>
+          <p><strong>Devenir du dioxygène (2 pts) :</strong> l’<strong>oxygène du dioxygène</strong> se retrouve dans l’<strong>eau</strong>. Le dioxygène est donc transformé en eau.</p>
+          <p><strong>Bilan et énergie (2 pts) :</strong> glucose + dioxygène → dioxyde de carbone + eau + énergie. Cette réaction chimique se déroule dans les cellules : c’est la <strong>respiration cellulaire</strong>. Elle libère l’énergie utilisée par la cellule pour fonctionner.</p>
+        </div>
+        <div class="bareme"><strong>Barème :</strong> 2 pts pour le carbone du glucose → dioxyde de carbone ; 2 pts pour l’oxygène du dioxygène → eau ; 2 pts pour le bilan complet avec les réactifs, les produits et l’énergie libérée. Le bilan doit être cohérent avec les deux lignes du tableau.</div>
+        <p class="small"><strong>Erreurs fréquentes :</strong> écrire que le glucose devient de l’eau ; oublier le dioxygène dans les réactifs ; écrire « glucose → énergie » sans produits ; placer la réaction dans les poumons ou dans le sang. La flèche se lit « réagit avec » ou « donne », pas « devient ».</p>
+
+        <div class="qtitle">Question 3 — Rédiger (8 points + 2 points MDL) — D1.3</div>
+        <div class="answer">
+          <p><strong>Réponse modèle (10 à 15 lignes) :</strong></p>
+          <p>Pendant un effort, les muscles ont besoin de plus d’énergie. Le rythme cardiaque passe de 70 à 180 battements par minute : le cœur propulse davantage de sang vers les muscles. Ce sang apporte du <strong>glucose</strong> et du <strong>dioxygène</strong> et emporte le dioxyde de carbone produit. Dans les cellules musculaires, le glucose réagit avec le dioxygène : il se forme du dioxyde de carbone et de l’eau, et de l’énergie est libérée. C’est la <strong>respiration cellulaire</strong>. Cette <strong>énergie</strong> permet la contraction des muscles. Le sang ne fabrique donc pas l’énergie : il transporte les réactifs et les déchets nécessaires à la respiration cellulaire.</p>
+        </div>
+        <div class="bareme"><strong>Barème (8 pts) :</strong> 2 pts pour le lien entre effort, besoin d’énergie et augmentation du rythme cardiaque (70 → 180 battements/min) ; 2 pts pour le rôle du sang (apport de glucose et de dioxygène, évacuation du dioxyde de carbone) ; 2 pts pour la réaction cellulaire (glucose + dioxygène → dioxyde de carbone + eau) ; 2 pts pour l’énergie libérée et son utilisation par le muscle. <strong>MDL (2 pts) :</strong> grille ci-dessous.</div>
+        <p class="small"><strong>Attendu :</strong> une réponse organisée, avec une phrase d’introduction, un développement en plusieurs étapes et une conclusion. Les cinq mots imposés doivent être employés correctement, pas seulement recopiés.</p>
+
+        <h3 style="color:var(--vert);margin-top:18px">Grille critériée LSU — 4 niveaux</h3>
+        <table>
+          <tr><th style="width:9%">Code</th><th style="width:20%">Compétence</th><th style="width:20%">Très bonne maîtrise</th><th style="width:18%">Maîtrise satisfaisante</th><th style="width:17%">Maîtrise fragile</th><th style="width:16%">Maîtrise insuffisante</th></tr>
+          <tr><td><strong>D4.2</strong></td><td>Lire et exploiter des données quantitatives</td><td>Les trois lignes sont comparées avec valeurs et unités ; les différences sont calculées et interprétées correctement.</td><td>Les valeurs sont comparées et les molécules prélevées ou rejetées sont identifiées, avec au moins une différence chiffrée.</td><td>Les valeurs sont lues mais non comparées, ou les unités sont confondues ; interprétation partielle.</td><td>Le tableau n’est pas lu ou les molécules prélevées et rejetées sont inversées.</td></tr>
+          <tr><td><strong>D4.1</strong></td><td>Pratiquer une démarche scientifique</td><td>Le devenir du carbone du glucose et de l’oxygène du dioxygène est relié au dioxyde de carbone et à l’eau ; le bilan est complet et la libération d’énergie est expliquée.</td><td>Les deux devenirs sont identifiés et le bilan de la respiration cellulaire est écrit correctement.</td><td>Un seul devenir est identifié ou le bilan est incomplet ; la notion d’énergie reste implicite.</td><td>Les molécules sont confondues ou le bilan contredit les documents.</td></tr>
+          <tr><td><strong>D1.3</strong></td><td>Communiquer en langage scientifique</td><td>Réponse organisée de 10 à 15 lignes, lexique exact, connecteurs, mise en relation des trois documents et distinction sang / cellule.</td><td>Réponse structurée et compréhensible ; les cinq mots imposés sont employés correctement ; quelques connecteurs.</td><td>Réponse partielle ou juxtaposition ; lexique imprécis ; mots imposés mal employés.</td><td>Réponse non organisée, hors sujet ou absence des mots imposés.</td></tr>
+        </table>
+
+        <h3 style="color:var(--vert);margin-top:18px">Grille MDL (2 points formatifs)</h3>
+        <table>
+          <tr><th style="width:22%">Dimension</th><th>Critères observables dans la copie</th></tr>
+          <tr><td><strong>Orthographe</strong></td><td>Accords sujet-verbe et dans le groupe nominal ; mots scientifiques correctement orthographiés : respiration cellulaire, glucose, dioxygène, dioxyde de carbone.</td></tr>
+          <tr><td><strong>Syntaxe</strong></td><td>Phrases complètes et compréhensibles ; ponctuation ; pas de succession de mots sans lien.</td></tr>
+          <tr><td><strong>Lexique scientifique</strong></td><td>Emploi exact de : respiration cellulaire, glucose, dioxygène, dioxyde de carbone, eau, nutriment, énergie, sang.</td></tr>
+          <tr><td><strong>Connecteurs logiques</strong></td><td>« car », « donc », « ainsi », « de plus », « alors que ».</td></tr>
+          <tr><td><strong>Changement de registre</strong></td><td>Passage du tableau et du graphique à un texte scientifique organisé, avec observation, interprétation et conclusion.</td></tr>
+        </table>
+
+        <h3 style="color:var(--vert);margin-top:18px">Récapitulatif du barème</h3>
+        <table>
+          <tr><th style="width:12%">Question</th><th style="width:14%">Compétence</th><th style="width:12%">Points</th><th>Attendu principal</th></tr>
+          <tr><td><strong>Q1</strong></td><td>D4.2</td><td class="num">4</td><td>Comparer le sang entrant et sortant ; identifier le glucose et le dioxygène prélevés, le dioxyde de carbone rejeté.</td></tr>
+          <tr><td><strong>Q2</strong></td><td>D4.1</td><td class="num">6</td><td>Relier le carbone du glucose au dioxyde de carbone et l’oxygène du dioxygène à l’eau ; écrire le bilan avec l’énergie.</td></tr>
+          <tr><td><strong>Q3</strong></td><td>D1.3</td><td class="num">8 + 2 MDL</td><td>Expliquer l’augmentation du rythme cardiaque, le transport par le sang, la respiration cellulaire et l’énergie musculaire.</td></tr>
+          <tr><td colspan="2"><strong>Total</strong></td><td class="num"><strong>20</strong></td><td>Activité formative : 18 points de contenu + 2 points de maîtrise de la langue.</td></tr>
+        </table>
+      </template>
+    </section>
+
+    <!-- ======================= ONGLET 4 : FICHE PROF ======================= -->
+    <section id="panneau-prof" class="panneau" aria-label="Fiche professeur">
+      <article class="fiche">
+        <div class="fiche-top"><div><strong>Guide professeur</strong> — SVT · 3<sup>e</sup> · Cycle 4</div><div>L’énergie des muscles · 55 min</div></div>
+
+        <div class="hero-fiche">
+          <div class="kicker">Préparation · correction · différenciation</div>
+          <h2>Guide de l’activité</h2>
+          <div class="sub">Objectifs, obstacle épistémologique, scénario et points de vigilance scientifiques.</div>
+        </div>
+
+        <div class="accroche-secret no-print" id="accroche-prof">
+          <span>🔒 <strong>Contenu enseignant</strong> — objectifs, déroulé, différenciation, notes scientifiques et sources.</span>
+          <button type="button" data-deverrouiller="prof">Déverrouiller (code)</button>
+        </div>
+
+        <div id="zone-prof" class="secret"></div>
+      </article>
+
+      <template id="tpl-prof">
+        <h3 style="color:var(--vert)">0. Export des copies vers Google Sheets — correction automatique</h3>
+        <div class="box note">
+          <p><strong>Principe.</strong> L’élève saisit uniquement <strong>nom, prénom, classe</strong> : aucun compte, aucune inscription, aucune plateforme, aucune adresse mail. Le bouton « Envoyer ma copie » transmet la copie au Google Sheet du professeur. Le script corrige automatiquement et classe chaque élève par compétence sur quatre niveaux (<strong>Très satisfaisante · Satisfaisante · Fragile · Insuffisante</strong>), avec un graphique et une feuille de remédiation.</p>
+          <p style="margin-bottom:0"><strong>Mise en route (une seule fois, 5 minutes) :</strong></p>
+          <ol style="font-size:.83rem;margin:5px 0 0 18px">
+            <li>Crée un Google Sheets vide, puis <em>Extensions &gt; Apps Script</em>.</li>
+            <li>Colle intégralement le script ci-dessous (bouton « Copier le script »), règle <code>CONFIG.TOKEN</code>, puis <em>Déployer &gt; Nouveau déploiement &gt; Application web</em> : <strong>Exécuter en tant que : Moi</strong> et <strong>Qui a accès : Tout le monde</strong> (indispensable : les élèves ne se connectent pas à ton compte Google).</li>
+            <li>Copie l’URL <code>/exec</code> obtenue et colle-la ci-dessous avec le même jeton, puis « Sauvegarder » et « Tester la connexion ».</li>
+            <li><strong>Pour distribuer le fichier aux élèves :</strong> renseigne <code>_build/config.txt</code> (URL + jeton) et relance <code>python _build/build.py</code>. L’URL est alors intégrée au HTML : chaque copie sur clé USB peut envoyer sans rien configurer. La configuration saisie ici reste prioritaire sur le poste du professeur.</li>
+          </ol>
+          <p class="small" style="margin:7px 0 0"><strong>Confidentialité.</strong> Le jeton n’est pas un secret (il est dans le fichier distribué) : il évite juste les envois accidentels. Le déploiement « Tout le monde » signifie que quiconque possède le lien peut écrire : ne collecte aucune donnée sensible. L’analyse est un <strong>indicateur automatique à valider</strong> — l’orthographe, la justesse d’une phrase et l’emploi réellement correct des mots imposés restent sous ton regard. Aucun endpoint de relecture publique n’est exposé : les copies ne se consultent que dans ton Sheet.</p>
+          <p class="small" style="margin:7px 0 0"><strong>Où intervenir dans la feuille « Copies ».</strong> Les colonnes <code>A_VALIDER</code>, <code>NB_ENVOIS</code>, <code>VALIDATION_PROF</code> et <code>NOTE_PROF</code> sont en fin de tableau. Écris librement dans <code>VALIDATION_PROF</code> (par ex. « Validé — orthographe revue ») et <code>NOTE_PROF</code> : <strong>un nouvel envoi de l’élève ne les écrase pas</strong>. <code>NB_ENVOIS</code> compte les reprises, utile pour repérer un élève qui a retravaillé sa copie. L’identifiant est calculé par le Sheet à partir de nom + prénom + classe normalisée : « 3e B », « 3°B » et « 3ème B » convergent, sans doublon.</p>
+          <p class="small" style="margin:7px 0 0"><strong>Valider une copie et suivre la remédiation.</strong> Dès que tu remplis <code>VALIDATION_PROF</code> (ou que tu passes <code>A_VALIDER</code> à « Non »), la copie est considérée comme traitée : elle <strong>disparaît de l’onglet « Remediation »</strong> et la colonne « À valider » de l’onglet « Synthese » affiche « Non ». Les copies déjà traitées sont comptées en bas de « Remediation ». « Synthese » présente pour chaque élève les niveaux D4.2 / D4.1 / D1.3, le score /20, l’état « À valider », le nombre d’envois et ta note ; deux graphiques (répartition des niveaux par compétence, score /20 par élève) sont placés <em>sous</em> les tableaux pour ne rien masquer. Pour forcer une reconstruction après une correction manuelle : « Régénérer la synthèse » dans la fiche prof.</p>
+          <p class="small" style="margin:7px 0 0"><strong>Si l’envoi échoue en classe.</strong> La copie reste enregistrée sur le poste (sauvegarde automatique) et le bouton « ⬇ Exporter ma copie (.txt) » permet de la récupérer sans rien perdre, même sans réseau.</p>
+        </div>
+
+        <div class="box config-prof">
+          <label for="cfg-url">URL du Google Apps Script (/exec)</label>
+          <input type="text" id="cfg-url" placeholder="https://script.google.com/macros/s/AKfycb…/exec" autocomplete="off" spellcheck="false">
+          <label for="cfg-jeton">Jeton partagé (identique à CONFIG.TOKEN dans Code.gs)</label>
+          <input type="text" id="cfg-jeton" placeholder="respiration-2027" autocomplete="off" spellcheck="false">
+          <div class="rang">
+            <button type="button" id="btn-cfg-sauver">💾 Sauvegarder</button>
+            <button type="button" id="btn-cfg-test" class="secondaire">🔌 Tester la connexion</button>
+            <button type="button" id="btn-cfg-copier" class="secondaire">📋 Copier le script</button>
+            <button type="button" id="btn-apercu-analyse" class="secondaire">🔍 Aperçu de l’analyse</button>
+            <button type="button" id="btn-cfg-regen" class="secondaire">🔄 Régénérer la synthèse</button>
+          </div>
+          <div id="cfg-etat" role="status" aria-live="polite"></div>
+          <details style="margin-top:9px">
+            <summary style="cursor:pointer;font-size:.82rem;font-weight:650;color:var(--vert)">Afficher le code du Google Apps Script (Code.gs)</summary>
+            <textarea id="code-gs" readonly spellcheck="false">__CODE_GS__</textarea>
+          </details>
+        </div>
+
+        <div class="box note" id="apercu-analyse" style="display:none"></div>
+
+        <div class="box tip">
+          <p class="accent" style="margin-bottom:3px">Grille utilisée pour la correction automatique</p>
+          <p style="font-size:.82rem;margin-bottom:4px">Le barème est celui du dossier : <strong>D4.2</strong> (Q1, 4 pts : valeurs chiffrées, unités, différences, sens des variations), <strong>D4.1</strong> (Q2, 6 pts : devenir du carbone, devenir de l’oxygène, bilan, lieu de la réaction), <strong>D1.3</strong> (Q3, 10 pts dont 2 de maîtrise de la langue : cinq mots imposés, chaîne causale, valeurs, rôle du sang). Total /20 ; seuils 80 / 60 / 40 %.</p>
+          <p style="font-size:.82rem;margin-bottom:4px"><strong>Maîtrise de la langue (2 pts MDL) :</strong> 1 pt pour les <strong>connecteurs logiques</strong> (variété + emplacement en tête de phrase ou après « : »), 1 pt pour la <strong>construction de la phrase</strong> (phrases complètes, marqueurs de subordination, majuscules et ponctuation de fin). La consigne « 10 à 15 lignes » reste dans l’énoncé élève mais <strong>n’entre pas dans la note automatique</strong> : le nombre de lignes est affiché à titre d’information seulement.</p>
+          <p style="font-size:.82rem;margin-bottom:4px"><strong>Limite à garder en tête :</strong> l’analyse compte des <em>signaux structurels</em>, elle ne juge ni la correction grammaticale ni la justesse d’une phrase. Orthographe, accords et emploi réellement correct des mots imposés restent sous ton regard : chaque copie est marquée « À valider ».</p>
+          <p style="font-size:.82rem;margin-bottom:0">Chaque ligne de la feuille indique <strong>ce qui manque</strong> pour chaque compétence : c’est la base de la remédiation. Une alerte signale les confusions fréquentes (« poumons », « brûle le glucose », mots imposés recopiés) sans retirer de point.</p>
+        </div>
+
+        <div class="box context">
+          <p><strong>Place dans le programme (cycle 4, 3<sup>e</sup>) :</strong> thème « Le corps humain et la santé ». L’activité traite des <strong>besoins énergétiques des cellules animales</strong>, de la <strong>respiration cellulaire</strong> (glucose + dioxygène → dioxyde de carbone + eau + énergie) et du <strong>rôle du sang</strong> dans le transport des nutriments, du dioxygène et des déchets.</p>
+          <p><strong>Durée :</strong> 55 min. <strong>Organisation :</strong> individuel ou binômes ; trois documents ; trois questions, dont une réponse rédigée de 10 à 15 lignes. <strong>Matériel :</strong> fiche élève imprimable, calculatrice non nécessaire, modélisation 3D projetée.</p>
+        </div>
+
+        <h3 style="color:var(--vert)">1. Objectifs et obstacle visé</h3>
+        <div class="grid-2">
+          <div class="box note">
+            <p class="accent">Objectifs de connaissances</p>
+            <ul>
+              <li>Identifier ce que le muscle prélève dans le sang (glucose, dioxygène) et ce qu’il y rejette (dioxyde de carbone).</li>
+              <li>Relier le devenir des atomes marqués à la transformation du glucose en dioxyde de carbone et du dioxygène en eau.</li>
+              <li>Écrire le bilan de la respiration cellulaire et identifier l’énergie libérée.</li>
+              <li>Relier l’augmentation du rythme cardiaque pendant l’effort à l’apport de sang aux muscles.</li>
+              <li>Distinguer respiration pulmonaire et respiration cellulaire.</li>
+              <li>Rédiger une réponse scientifique organisée et argumentée.</li>
+            </ul>
+          </div>
+          <div class="box problem">
+            <p class="accent">Obstacle épistémologique ciblé</p>
+            <p><strong>Conception fausse :</strong> « la respiration se limite aux poumons ; l’air apporte directement l’énergie aux muscles ; le sang ne sert qu’à transporter l’oxygène ».</p>
+            <p><strong>Rupture didactique :</strong> distinguer la respiration pulmonaire (échanges de gaz avec l’air) de la respiration cellulaire (réaction chimique dans les cellules). Les documents 1 et 2 montrent que le glucose et le dioxygène sont consommés dans le muscle et transformés en dioxyde de carbone et en eau, avec libération d’énergie. Le sang transporte les réactifs et les déchets : il ne fabrique pas l’énergie.</p>
+          </div>
+        </div>
+        <div class="box note"><p><strong>Compétences travaillées :</strong> <span class="pill">D4.2</span> lire et exploiter des données quantitatives · <span class="pill">D4.1</span> pratiquer une démarche scientifique · <span class="pill">D1.3</span> communiquer en langage scientifique. <strong>Compétences psychosociales :</strong> esprit critique, coopération, persévérance, santé et bien-être.</p></div>
+
+        <h3 style="color:var(--vert)">2. Scénario de gestion du temps</h3>
+        <div class="box tip">
+          <p><strong>0–5 min :</strong> accroche (monsieur X, 70 → 180 battements/min), problème et rappel du vocabulaire. <strong>5–18 min :</strong> document 1 et question 1. <strong>18–33 min :</strong> document 2 et question 2, avec projection de la modélisation 3D (entrée des réactifs, activation de la seule mitochondrie, sortie des déchets). <strong>33–50 min :</strong> document 3 et réponse rédigée. <strong>50–55 min :</strong> mise en commun, bilan interactif, auto-évaluation et critères MDL.</p>
+        </div>
+
+        <h3 style="color:var(--vert)">3. Différenciation</h3>
+        <div class="grid-2">
+          <div class="box note"><p class="accent">Parcours guidé</p><p>Découper la tâche en trois étapes : Q1 (lire les colonnes, comparer, identifier), Q2 (suivre chaque atome marqué, puis écrire le bilan), Q3 (suivre la chaîne : effort → cœur → sang → cellule → énergie). Fournir la trame « D’abord… Ensuite… Enfin… ».</p></div>
+          <div class="box note"><p class="accent">Parcours autonome</p><p>Laisser les élèves lire les trois documents et rédiger directement la réponse de Q3, après Q1 et Q2. Exiger une justification par le document et l’emploi des cinq mots. Proposer une relecture ciblée sur les connecteurs et la distinction sang / cellule.</p></div>
+        </div>
+        <div class="box tip">
+          <p><strong>Trois niveaux de coups de pouce (fiche élève).</strong></p>
+          <p><strong>Niveau 1 — Méthode :</strong> comparer les colonnes « sang entrant » et « sang sortant » ; une valeur qui diminue est prélevée, une valeur qui augmente est rejetée. Lire le tableau du document 2 ligne par ligne. Sur le graphique, repérer le repos, l’effort et la récupération.</p>
+          <p><strong>Niveau 2 — Indice :</strong> document 1 : dioxygène 200 → 150 mL, glucose 900 → 800 mg, dioxyde de carbone 490 → 560 mL. Document 2 : carbone du glucose → dioxyde de carbone ; oxygène du dioxygène → eau. Document 3 : 70 → 180 battements par minute.</p>
+          <p><strong>Niveau 3 — Notion :</strong> la respiration cellulaire est une réaction chimique : glucose + dioxygène → dioxyde de carbone + eau + énergie. Le sang transporte les réactifs et les déchets ; il ne fabrique pas l’énergie.</p>
+        </div>
+
+        <h3 style="color:var(--vert)">4. Points de vigilance scientifiques et sources</h3>
+        <div class="box warn">
+          <p><strong>Deux sens du mot « respiration ».</strong> La respiration pulmonaire correspond aux échanges de gaz entre l’air et le sang dans les poumons. La respiration cellulaire est la réaction chimique qui se déroule dans les cellules. Ne pas confondre les deux : l’activité porte sur la respiration cellulaire.</p>
+          <p><strong>Unité du glucose.</strong> Le tableau du document 1 est issu de Lelivrescolaire.fr. La source indique « Glucose (g) » avec les valeurs 900 et 800 ; l’unité a été rétablie en <strong>mg</strong> (900 mg = 0,9 g par litre de sang), seule valeur physiologiquement cohérente. Les nombres n’ont pas été modifiés.</p>
+          <p><strong>Lecture du graphique.</strong> Le document 3 provient du sujet DNB 2018 (18GENSCMEAG3). L’effort débute à la 2<sup>e</sup> minute : le rythme passe de 70 à 180 battements/min en 3 minutes d’effort (plateau atteint vers la 5<sup>e</sup> minute), se maintient jusqu’à la 8<sup>e</sup> minute, puis redescend vers 120 à la 10<sup>e</sup> minute. Ne pas surinterpréter la minute exacte du début du plateau.</p>
+          <p><strong>La micrographie est illustrative.</strong> Elle montre la diminution des réserves glucidiques après effort, mais elle ne permet pas de mesurer une quantité. Les valeurs quantitatives sont dans le tableau.</p>
+          <p><strong>Ne pas dire que le muscle « brûle » le glucose</strong> au sens d’une combustion : il s’agit d’une oxydation chimique progressive, qui libère de l’énergie et produit aussi de la chaleur. C’est pour cela que l’on a chaud pendant un effort.</p>
+          <p><strong>La modélisation 3D.</strong> Elle regroupe dans la mitochondrie l’essentiel de la respiration cellulaire et laisse le noyau, la membrane et le cytoplasme inertes : c’est un choix didactique, pas une description complète (la glycolyse a lieu dans le cytoplasme, la cellule musculaire n’est pas sphérique, la mitochondrie est agrandie). L’énergie représentée reste dans la cellule : elle n’est pas un déchet rejeté.</p>
+          <p><strong>Aucune donnée inventée :</strong> toutes les valeurs chiffrées proviennent des documents 1 et 3. Ne pas ajouter de débit cardiaque, de consommation de glucose ou de nombre de mitochondries non sourcés.</p>
+        </div>
+        <div class="box check">
+          <p><strong>Sources.</strong></p>
+          <ul class="small">
+            <li>Lelivrescolaire.fr, SVT 3e (2017), « Comment sont réalisés les échanges entre le sang et les cellules ? » : https://www.lelivrescolaire.fr/page/15920671</li>
+            <li>Lelivrescolaire.fr, SVT 3e (2017), « La nutrition à l’échelle cellulaire » (bilan) : https://www.lelivrescolaire.fr/page/16877057</li>
+            <li>DNB 2018, session de remplacement, sujet 18GENSCMEAG3, document 1 : rythme cardiaque de monsieur X lors de sa course sur tapis roulant.</li>
+          </ul>
+        </div>
+        <div class="box note"><p><strong>Prolongements possibles.</strong> Mesurer son propre rythme cardiaque au repos et après 30 flexions, puis comparer avec le graphique de monsieur X. Utiliser le schéma bilan « respiration et photosynthèse » pour comparer cellules animales et végétales. Faire rechercher pourquoi l’effort produit de la chaleur.</p></div>
+      </template>
+    </section>
+
+  </main>
+
+  <footer>
+    <div class="legende-pied">
+      <span><i class="puce" style="background:#8a97a4"></i>Carbone</span>
+      <span><i class="puce" style="background:#ff665e"></i>Oxygène</span>
+      <span><i class="puce" style="background:#f3f7ff;border:1px solid #b9c8d4"></i>Hydrogène</span>
+      <span><i class="puce" style="background:#ffd84d"></i>Énergie (ATP)</span>
+      <span><i class="puce" style="background:#f47745"></i>Mitochondrie</span>
+      <span><i class="puce" style="background:#a48be0"></i>Noyau</span>
+    </div>
+    <span class="credits no-print">Glisser : tourner · Molette : zoomer · Cliquer un élément : fiche d’information · Corrections : code 2027</span>
+  </footer>
+</div>
+
+<!-- ======================= VERROU ENSEIGNANT ======================= -->
+<div id="verrou" role="dialog" aria-modal="true" aria-labelledby="titre-verrou">
+  <div class="carte-verrou">
+    <div class="cadenas">🔒</div>
+    <h2 id="titre-verrou">Accès enseignant</h2>
+    <p>Le corrigé, le barème et la fiche professeur sont réservés à l’équipe enseignante.</p>
+    <input type="password" id="code-verrou" inputmode="numeric" maxlength="4" placeholder="••••" aria-label="Code de correction">
+    <button type="button" id="valider-verrou">Valider</button>
+    <button type="button" id="annuler-verrou" class="annuler">Annuler</button>
+    <div id="erreur-verrou">Code incorrect.</div>
+  </div>
+</div>
+
+<script>__BUNDLE_JS__</script>
+<script>__APP_JS__</script>
+</body>
+</html>

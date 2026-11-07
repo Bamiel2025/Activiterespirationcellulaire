@@ -1,0 +1,798 @@
+{
+  "canvas WebGL créé": {
+    "ok": true,
+    "detail": {
+      "w": 1366,
+      "h": 556,
+      "cssW": 1366,
+      "cssH": 556
+    }
+  },
+  "scène 3D active (pas de message de secours)": {
+    "ok": true,
+    "detail": "none"
+  },
+  "4 étiquettes d'organites présentes": {
+    "ok": true,
+    "detail": [
+      "Membrane plasmique",
+      "Cytoplasme",
+      "Noyau — ne participe pas à la réaction",
+      "Mitochondrie — lieu de la réaction",
+      "Glucose",
+      "Dioxygène O₂"
+    ]
+  },
+  "étiquettes des réactifs à l'étape 1": {
+    "ok": true,
+    "detail": [
+      "Membrane plasmique",
+      "Cytoplasme",
+      "Noyau — ne participe pas à la réaction",
+      "Mitochondrie — lieu de la réaction",
+      "Glucose",
+      "Dioxygène O₂"
+    ]
+  },
+  "étape 1 affichée au démarrage": {
+    "ok": true,
+    "detail": "1 · Le sang apporte les réactifs"
+  },
+  "init3D": {
+    "canvas": {
+      "w": 1366,
+      "h": 556,
+      "cssW": 1366,
+      "cssH": 556
+    },
+    "secours": "none",
+    "etiquettes": 6,
+    "etiquettesVisibles": 6,
+    "textes": [
+      "Membrane plasmique",
+      "Cytoplasme",
+      "Noyau — ne participe pas à la réaction",
+      "Mitochondrie — lieu de la réaction",
+      "Glucose",
+      "Dioxygène O₂"
+    ],
+    "titreEtape": "1 · Le sang apporte les réactifs"
+  },
+  "étape 3 = mitochondrie": {
+    "ok": true,
+    "detail": "3 · La respiration cellulaire dans la mitochondrie"
+  },
+  "document 2 associé": {
+    "ok": true,
+    "detail": "Doc. 2"
+  },
+  "équation équilibrée affichée": {
+    "ok": true,
+    "detail": "C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O + énergie"
+  },
+  "un seul bouton d'étape actif": {
+    "ok": true,
+    "detail": 1
+  },
+  "etapeReaction": {
+    "titre": "3 · La respiration cellulaire dans la mitochondrie",
+    "doc": "Doc. 2",
+    "eq": "C₆H₁₂O₆ + 6 O₂ → 6 CO₂ + 6 H₂O + énergie",
+    "eqVisible": true,
+    "boutonActif": 1
+  },
+  "étape 4 = énergie conservée": {
+    "ok": true,
+    "detail": "4 · Déchets rejetés, énergie conservée"
+  },
+  "labels des produits et de l'énergie à l'étape 4": {
+    "ok": true,
+    "detail": [
+      "Membrane plasmique",
+      "Cytoplasme",
+      "Noyau — ne participe pas à la réaction",
+      "Mitochondrie — lieu de la réaction",
+      "Glucose",
+      "Dioxygène O₂",
+      "CO₂ (déchet)",
+      "H₂O",
+      "Énergie (ATP) — reste dans la cellule"
+    ]
+  },
+  "etapeFin": {
+    "titre": "4 · Déchets rejetés, énergie conservée",
+    "doc": "Doc. 1 & 3",
+    "textes": [
+      "Membrane plasmique",
+      "Cytoplasme",
+      "Noyau — ne participe pas à la réaction",
+      "Mitochondrie — lieu de la réaction",
+      "Glucose",
+      "Dioxygène O₂",
+      "CO₂ (déchet)",
+      "H₂O",
+      "Énergie (ATP) — reste dans la cellule"
+    ]
+  },
+  "activité seule visible": {
+    "ok": true,
+    "detail": [
+      "panneau-3d:none",
+      "panneau-activite:block",
+      "panneau-bilan:none",
+      "panneau-prof:none"
+    ]
+  },
+  "panneaux": [
+    "panneau-3d:none",
+    "panneau-activite:block",
+    "panneau-bilan:none",
+    "panneau-prof:none"
+  ],
+  "2 documents illustrés embarqués": {
+    "ok": true,
+    "detail": [
+      {
+        "chargee": true,
+        "largeur": 1600,
+        "src": "data:image/jpeg;base64"
+      },
+      {
+        "chargee": true,
+        "largeur": 651,
+        "src": "data:image/png;base64,"
+      }
+    ]
+  },
+  "aucune image distante": {
+    "ok": true,
+    "detail": [
+      "data:image/jpeg;base64",
+      "data:image/png;base64,"
+    ]
+  },
+  "images": [
+    {
+      "chargee": true,
+      "largeur": 1600,
+      "src": "data:image/jpeg;base64"
+    },
+    {
+      "chargee": true,
+      "largeur": 651,
+      "src": "data:image/png;base64,"
+    }
+  ],
+  "3 questions de l'activité": {
+    "ok": true,
+    "detail": {
+      "q1": true,
+      "q2": true,
+      "q3": true,
+      "tableau": 4,
+      "valeurs": 8
+    }
+  },
+  "tableau doc 1 à 4 lignes": {
+    "ok": true,
+    "detail": 4
+  },
+  "8 valeurs chiffrées du dossier": {
+    "ok": true,
+    "detail": 8
+  },
+  "contenuActivite": {
+    "q1": true,
+    "q2": true,
+    "q3": true,
+    "tableau": 4,
+    "valeurs": 8
+  },
+  "autosave restaurée après rechargement": {
+    "ok": true,
+    "detail": {
+      "q1": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang.",
+      "nom": "Dupont"
+    }
+  },
+  "autosave": {
+    "q1": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang.",
+    "nom": "Dupont"
+  },
+  "bilan 7/7": {
+    "ok": true,
+    "detail": "✓ 7 / 7 — le bilan est exact."
+  },
+  "trace écrite révélée": {
+    "ok": true,
+    "detail": "glucose + dioxygène → dioxyde de carbone + eau + énergie"
+  },
+  "bilan": {
+    "texte": "✓ 7 / 7 — le bilan est exact.",
+    "traceVisible": true,
+    "bons": 7,
+    "equation": "glucose + dioxygène → dioxyde de carbone + eau + énergie"
+  },
+  "corrigé masqué avant code": {
+    "ok": true,
+    "detail": "none"
+  },
+  "code erroné refusé": {
+    "ok": true,
+    "detail": {
+      "erreur": "block",
+      "modal": true,
+      "corrige": "none"
+    }
+  },
+  "code 2027 débloque corrigé + fiche prof": {
+    "ok": true,
+    "detail": {
+      "modal": false,
+      "corrige": "block",
+      "prof": "block",
+      "texteCorrige": true,
+      "texteProf": true
+    }
+  },
+  "verrou": {
+    "mauvais": {
+      "erreur": "block",
+      "modal": true,
+      "corrige": "none"
+    },
+    "bon": {
+      "modal": false,
+      "corrige": "block",
+      "prof": "block",
+      "texteCorrige": true,
+      "texteProf": true
+    }
+  },
+  "impression = fiche élève seule": {
+    "ok": true,
+    "detail": {
+      "onglets": "none",
+      "zone3d": "none",
+      "activite": "block",
+      "bilan": "none",
+      "textarea": "none",
+      "miroirs": 3,
+      "miroirDisplay": "block",
+      "miroirTexte": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang."
+    }
+  },
+  "réponses recopiées à l'impression": {
+    "ok": true,
+    "detail": {
+      "onglets": "none",
+      "zone3d": "none",
+      "activite": "block",
+      "bilan": "none",
+      "textarea": "none",
+      "miroirs": 3,
+      "miroirDisplay": "block",
+      "miroirTexte": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang."
+    }
+  },
+  "impression": {
+    "onglets": "none",
+    "zone3d": "none",
+    "activite": "block",
+    "bilan": "none",
+    "textarea": "none",
+    "miroirs": 3,
+    "miroirDisplay": "block",
+    "miroirTexte": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang."
+  },
+  "Sheet simulé : URL injectée dans la meta": {
+    "ok": true,
+    "detail": "http://127.0.0.1:8791/sheet"
+  },
+  "identité : exactement nom, prénom, classe — aucun champ date": {
+    "ok": true,
+    "detail": {
+      "champs": [
+        "nom",
+        "prenom",
+        "classe"
+      ],
+      "blocEnvoi": true,
+      "metaUrl": "http://127.0.0.1:8791/sheet"
+    }
+  },
+  "envoi refusé si le nom manque": {
+    "ok": true,
+    "detail": "✗ Renseigne ton nom, ton prénom, ta classe avant d'envoyer."
+  },
+  "confirmation explicite avant envoi": {
+    "ok": true,
+    "detail": {
+      "visible": true,
+      "nom": "Martin",
+      "prenom": "Léa",
+      "classe": "3e B",
+      "texte": "Vérifie avant d’envoyer\n\nMartin · Léa · 3e B\nLes réponses Q1, Q2, Q3, le score du bilan et l’analyse par compétences.\nAucune adresse mail, aucun mot de passe, aucune donnée de l’appareil, aucun suivi de connexion.\nConfirmer l’envoi Annuler"
+    }
+  },
+  "l'élève peut annuler l'envoi": {
+    "ok": true,
+    "detail": true
+  },
+  "aucune copie transmise après annulation": {
+    "ok": true,
+    "detail": 0
+  },
+  "accusé de réception affiché à l'élève": {
+    "ok": true,
+    "detail": {
+      "texte": "✓ Copie envoyée au professeur.",
+      "classe": "succes",
+      "nouvelle": "block"
+    }
+  },
+  "envoi": {
+    "texte": "✓ Copie envoyée au professeur.",
+    "classe": "succes",
+    "nouvelle": "block"
+  },
+  "1 copie reçue par le Sheet": {
+    "ok": true,
+    "detail": 1
+  },
+  "transmission STRICTEMENT limitée à nom, prénom, classe et réponses": {
+    "ok": true,
+    "detail": [
+      "analyse",
+      "autoEvaluation",
+      "bilanScore",
+      "classe",
+      "nom",
+      "prenom",
+      "q1",
+      "q2",
+      "q3"
+    ]
+  },
+  "aucune date ni horodatage de l'appareil transmis": {
+    "ok": true,
+    "detail": [
+      "nom",
+      "prenom",
+      "classe",
+      "q1",
+      "q2",
+      "q3",
+      "bilanScore",
+      "autoEvaluation",
+      "analyse"
+    ]
+  },
+  "identité reçue conforme": {
+    "ok": true,
+    "detail": {
+      "nom": "Martin",
+      "prenom": "Léa",
+      "classe": "3e B",
+      "q1": "Le muscle prélève 50 mL de dioxygène et 100 mg de glucose par litre de sang.",
+      "q2": "Le carbone du glucose se retrouve dans le dioxyde de carbone et l'oxygène du dioxygène dans l'eau. Bilan : glucose + dioxygène → dioxyde de carbone + eau + énergie.",
+      "q3": "D'abord, pendant un effort, les muscles ont besoin de davantage d'énergie.\nLe rythme cardiaque de monsieur X passe de 70 à 180 battements par minute : le cœur envoie donc plus de sang vers les muscles.\nEnsuite, ce sang transporte le glucose et le dioxygène prélevés, ainsi que le dioxyde de carbone rejeté.\nLes valeurs du document 1 montrent que le dioxygène passe de 200 à 150 mL et le glucose de 900 à 800 mg.\nLe dioxyde de carbone passe de 490 à 560 mL : il est rejeté par le muscle.\nDans les cellules musculaires, la respiration cellulaire transforme le glucose et le dioxygène en dioxyde de carbone et en eau.\nCette réaction libère ainsi de l'énergie utilisable par les muscles.\nCette énergie sert à la contraction des muscles, alors que le sang ne fait que transporter les réactifs et les déchets.\nLa respiration pulmonaire, elle, correspond aux échanges de gaz dans les poumons.\nEn conclusion, c'est bien dans les cellules que l'énergie est produite, et non dans le sang.\nLe sang ne fabrique donc pas l'énergie : il approvisionne la respiration cellulaire.",
+      "bilanScore": 7,
+      "autoEvaluation": {
+        "c1": false,
+        "c2": false,
+        "c3": false,
+        "c4": false
+      },
+      "analyse": {
+        "version": "energie-muscles-grille-v1",
+        "aValider": true,
+        "competences": {
+          "D4.2": {
+            "code": "D4.2",
+            "libelle": "Lire et exploiter des données quantitatives",
+            "max": 4,
+            "score": 1.92,
+            "pourcent": 48,
+            "niveau": "Fragile",
+            "criteres": [
+              {
+                "id": "valeurs",
+                "libelle": "Valeurs chiffrées du document 1",
+                "max": 1.5,
+                "points": 0,
+                "acquis": false,
+                "manque": "citer les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL)"
+              },
+              {
+                "id": "unites",
+                "libelle": "Unités",
+                "max": 0.5,
+                "points": 0.5,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "differences",
+                "libelle": "Différences calculées",
+                "max": 0.5,
+                "points": 0.5,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "molecules",
+                "libelle": "Molécules identifiées",
+                "max": 1,
+                "points": 0.67,
+                "acquis": false,
+                "manque": "nommer glucose, dioxygène et dioxyde de carbone"
+              },
+              {
+                "id": "sens",
+                "libelle": "Sens des variations",
+                "max": 0.5,
+                "points": 0.25,
+                "acquis": false,
+                "manque": "dire ce que le muscle prélève et ce qu'il rejette"
+              }
+            ],
+            "manques": [
+              "citer les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL)",
+              "nommer glucose, dioxygène et dioxyde de carbone",
+              "dire ce que le muscle prélève et ce qu'il rejette"
+            ]
+          },
+          "D4.1": {
+            "code": "D4.1",
+            "libelle": "Pratiquer une démarche scientifique",
+            "max": 6,
+            "score": 4.5,
+            "pourcent": 75,
+            "niveau": "Satisfaisante",
+            "criteres": [
+              {
+                "id": "carbone",
+                "libelle": "Devenir du carbone du glucose",
+                "max": 1.5,
+                "points": 1.5,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "oxygene",
+                "libelle": "Devenir de l'oxygène du dioxygène",
+                "max": 1.5,
+                "points": 1.5,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "bilan",
+                "libelle": "Bilan complet de la réaction",
+                "max": 1.5,
+                "points": 1.5,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "lieu",
+                "libelle": "Lieu et nom de la réaction",
+                "max": 1.5,
+                "points": 0,
+                "acquis": false,
+                "manque": "situer la respiration cellulaire dans les cellules (mitochondries)"
+              }
+            ],
+            "manques": [
+              "situer la respiration cellulaire dans les cellules (mitochondries)"
+            ]
+          },
+          "D1.3": {
+            "code": "D1.3",
+            "libelle": "Communiquer en langage scientifique",
+            "max": 10,
+            "score": 10,
+            "pourcent": 100,
+            "niveau": "Très satisfaisante",
+            "criteres": [
+              {
+                "id": "mots",
+                "libelle": "Cinq mots imposés",
+                "max": 2,
+                "points": 2,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "chaine",
+                "libelle": "Chaîne effort → cœur → sang → cellule → énergie",
+                "max": 2,
+                "points": 2,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "valeurs",
+                "libelle": "Valeurs des documents 1 et 3",
+                "max": 2,
+                "points": 2,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "roleSang",
+                "libelle": "Rôle du sang et lieu cellulaire",
+                "max": 2,
+                "points": 2,
+                "acquis": true,
+                "manque": ""
+              },
+              {
+                "id": "mdl",
+                "libelle": "Maîtrise de la langue (2 pts MDL)",
+                "max": 2,
+                "points": 2,
+                "acquis": true,
+                "manque": ""
+              }
+            ],
+            "manques": []
+          }
+        },
+        "total": {
+          "score": 16.42,
+          "max": 20,
+          "pourcent": 82,
+          "niveau": "Très satisfaisante"
+        },
+        "indicateurs": {
+          "motsImposes": [
+            "respiration cellulaire",
+            "glucose",
+            "dioxygene",
+            "sang",
+            "energie"
+          ],
+          "motsAbsents": [],
+          "valeursQ1": [],
+          "differencesQ1": [
+            50,
+            100
+          ],
+          "valeursQ3": [
+            200,
+            150,
+            900,
+            800,
+            490,
+            560,
+            70
+          ],
+          "valeursDoc3": [
+            70,
+            180
+          ],
+          "unites": [
+            "mL",
+            "mg"
+          ],
+          "connecteurs": [
+            "donc",
+            "ainsi",
+            "d'abord",
+            "ensuite",
+            "alors que",
+            "en conclusion"
+          ],
+          "nbConnecteurs": 6,
+          "phrases": 11,
+          "virgules": 13,
+          "lignes": 11,
+          "bilanScore": 7
+        },
+        "alertes": [],
+        "resume": "D4.2 1.92/4 Fragile — manque : citer les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL) ; nommer glucose, dioxygène et dioxyde de carbone ; dire ce que le muscle prélève et ce qu'il rejette | D4.1 4.5/6 Satisfaisante — manque : situer la respiration cellulaire dans les cellules (mitochondries) | D1.3 10/10 Très satisfaisante — acquis"
+      }
+    }
+  },
+  "analyse : 3 compétences et total /20": {
+    "ok": true,
+    "detail": {
+      "score": 16.42,
+      "max": 20,
+      "pourcent": 82,
+      "niveau": "Très satisfaisante"
+    }
+  },
+  "analyse = indicateur à valider, pas une note": {
+    "ok": true,
+    "detail": true
+  },
+  "4 niveaux de maîtrise pour la remédiation": {
+    "ok": true,
+    "detail": {
+      "niveaux": [
+        "Très satisfaisante",
+        "Satisfaisante",
+        "Fragile",
+        "Insuffisante"
+      ],
+      "obtenu": "Très satisfaisante"
+    }
+  },
+  "renvoi de la même copie = mise à jour, pas de doublon": {
+    "ok": true,
+    "detail": 1
+  },
+  "jeton invalide refusé par le Sheet": {
+    "ok": true,
+    "detail": {
+      "ok": false,
+      "error": "Jeton invalide (Sheet simulé)."
+    }
+  },
+  "échec d'envoi : repli vers l'export .txt proposé": {
+    "ok": true,
+    "detail": {
+      "texte": "✗ Jeton invalide (test de repli) Ta copie reste enregistrée sur cet appareil : utilise « ⬇ Exporter ma copie (.txt) » pour ne rien perdre.",
+      "classe": "erreur"
+    }
+  },
+  "fiche prof : URL et jeton pré-remplis": {
+    "ok": true,
+    "detail": {
+      "url": "http://127.0.0.1:8791/sheet",
+      "jeton": "respiration-2027",
+      "script": 21322,
+      "boutons": 5
+    }
+  },
+  "fiche prof : Code.gs complet fourni": {
+    "ok": true,
+    "detail": {
+      "url": "http://127.0.0.1:8791/sheet",
+      "jeton": "respiration-2027",
+      "script": 21322,
+      "boutons": 5
+    }
+  },
+  "test de connexion depuis la fiche prof": {
+    "ok": true,
+    "detail": {
+      "texte": "✓ Connexion OK. Onglets prêts : Copies, Synthese, Remediation.",
+      "classe": "succes"
+    }
+  },
+  "régénération manuelle depuis la fiche prof": {
+    "ok": true,
+    "detail": {
+      "texte": "✓ Synthèse reconstruite.",
+      "classe": "succes"
+    }
+  },
+  "aperçu de l'analyse : 3 compétences détaillées": {
+    "ok": true,
+    "detail": {
+      "visible": "block",
+      "lignes": 4,
+      "texte": "Aperçu de l'analyse automatique — 16.42/20 · Très satisfaisante\n\nCompétence\tScore\tNiveau\tCe qui manque\nD4.2 — Lire et exploiter des données quantitatives\t1.92/4\tFragile\tciter les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL) ; nommer glucose, dioxygène et dioxyde de carbone ; dire ce que le muscle prélève et ce qu'il rejette\nD4.1 — Pratiquer une démarche scientifique\t4.5/6\tSatisfaisante\tsituer la respiration cellulaire dans les cellules (mitochondries)\nD1.3 — Communiquer en langage scientifique\t10/10\tTrès satisfaisante\t— rien, tous les critères sont acquis —\n\nConnecteurs (6) : donc, ainsi, d'abord, ensuite, alors que, en conclusion · Mots imposés absents : aucun · Valeurs du doc. 1 : aucune · Lignes mesurées : 11 · Phrases : 11\n\n⚠️ Indicateur automatique, pas une note : la copie reste marquée « À valider » dans le Google Sheet. L'orthographe, la justesse des phrases et l'emploi réellement correct des mots imposés relèvent de ton regard."
+    }
+  },
+  "aperçu prof : lignes conformes au compteur de la fiche élève": {
+    "ok": true,
+    "detail": 11
+  },
+  "aperçu prof : critère « 10 à 15 lignes » non signalé à tort": {
+    "ok": true,
+    "detail": "Aperçu de l'analyse automatique — 16.42/20 · Très satisfaisante\n\nCompétence\tScore\tNiveau\tCe qui manque\nD4.2 — Lire et exploiter des données quantitatives\t1.92/4\tFragile\tciter les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL) ; nommer glucose, dioxygène et dioxyde de carbone ; dire ce que le muscle prélève et ce qu'il rejette\nD4.1 — Pratiquer une démarche scientifique\t4.5/6\tSatisfa"
+  },
+  "nouvelle copie : effacement en deux clics": {
+    "ok": true,
+    "detail": {
+      "q1": "",
+      "nom": "",
+      "bouton": "none"
+    }
+  },
+  "sheets": {
+    "copies": 1,
+    "identite": {
+      "champs": [
+        "nom",
+        "prenom",
+        "classe"
+      ],
+      "blocEnvoi": true,
+      "metaUrl": "http://127.0.0.1:8791/sheet"
+    },
+    "cfg": {
+      "url": "http://127.0.0.1:8791/sheet",
+      "jeton": "respiration-2027",
+      "script": 21322,
+      "boutons": 5
+    },
+    "apercu": {
+      "visible": "block",
+      "lignes": 4,
+      "texte": "Aperçu de l'analyse automatique — 16.42/20 · Très satisfaisante\n\nCompétence\tScore\tNiveau\tCe qui manque\nD4.2 — Lire et exploiter des données quantitatives\t1.92/4\tFragile\tciter les valeurs du doc. 1 (200 → 150 mL ; 900 → 800 mg ; 490 → 560 mL) ; nommer glucose, dioxygène et dioxyde de carbone ; dire ce que le muscle prélève et ce qu'il rejette\nD4.1 — Pratiquer une démarche scientifique\t4.5/6\tSatisfaisante\tsituer la respiration cellulaire dans les cellules (mitochondries)\nD1.3 — Communiquer en langage scientifique\t10/10\tTrès satisfaisante\t— rien, tous les critères sont acquis —\n\nConnecteurs (6) : donc, ainsi, d'abord, ensuite, alors que, en conclusion · Mots imposés absents : aucun · Valeurs du doc. 1 : aucune · Lignes mesurées : 11 · Phrases : 11\n\n⚠️ Indicateur automatique, pas une note : la copie reste marquée « À valider » dans le Google Sheet. L'orthographe, la justesse des phrases et l'emploi réellement correct des mots imposés relèvent de ton regard."
+    },
+    "clefsCopie": [
+      "analyse",
+      "autoEvaluation",
+      "bilanScore",
+      "classe",
+      "nom",
+      "prenom",
+      "q1",
+      "q2",
+      "q3"
+    ]
+  },
+  "0 erreur JS dans la console": {
+    "ok": true,
+    "detail": []
+  },
+  "erreursApplicatives": [],
+  "aucune ressource externe chargée": {
+    "ok": true,
+    "detail": []
+  },
+  "noyau entièrement contenu dans la cellule": {
+    "ok": true,
+    "detail": {
+      "rayonCellule": 4.6,
+      "rayonNoyau": 1.25,
+      "distanceNoyau": 2.52,
+      "marge": 0.83
+    }
+  },
+  "geometrieNoyau": {
+    "rayonCellule": 4.6,
+    "rayonNoyau": 1.25,
+    "marge": 0.8256188877271318
+  },
+  "seule la mitochondrie est animée": {
+    "ok": true,
+    "detail": {
+      "bloc": "SEULE LA MITOCHONDRIE RÉAGIT ===== */ const reaction = Math.max(0, 1 - Math.abs(t - 0.50) / 0.14); mito.scale.setScalar(1 + reaction * 0.045); lumReaction.intensity = reaction * 24; halo.material.opacity = reaction * 0.20; matCrete.emissive",
+      "animesInterdits": []
+    }
+  },
+  "ouverture hors ligne file:// : 3D active": {
+    "ok": true,
+    "detail": {
+      "canvas": true,
+      "secours": "none",
+      "onglets": 4,
+      "images": 2,
+      "etiquettes": 6,
+      "localStorage": "disponible"
+    }
+  },
+  "ouverture hors ligne file:// : 4 onglets et 2 documents illustrés": {
+    "ok": true,
+    "detail": {
+      "canvas": true,
+      "secours": "none",
+      "onglets": 4,
+      "images": 2,
+      "etiquettes": 6,
+      "localStorage": "disponible"
+    }
+  },
+  "ouverture hors ligne file:// : 0 erreur JS": {
+    "ok": true,
+    "detail": []
+  },
+  "horsLigne": {
+    "canvas": true,
+    "secours": "none",
+    "onglets": 4,
+    "images": 2,
+    "etiquettes": 6,
+    "localStorage": "disponible"
+  },
+  "total": "57/57",
+  "sortie": "TOUS LES TESTS PASSENT"
+}

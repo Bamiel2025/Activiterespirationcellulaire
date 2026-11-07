@@ -125,29 +125,20 @@
   let minuterie = null;
 
   function charger() {
-    try {
-      const donnees = JSON.parse(localStorage.getItem(CLE) || "{}");
-      champs.forEach(champ => {
-        const valeur = donnees[champ.id];
-        if (valeur === undefined) return;
-        if (champ.type === "checkbox") champ.checked = !!valeur;
-        else champ.value = valeur;
-      });
-    } catch (e) { /* localStorage indisponible : on continue sans sauvegarde */ }
+    /* L'activité doit être vierge à chaque connexion : on ne restaure rien
+       et on purge toute ancienne copie mémorisée sur l'appareil. */
+    try { localStorage.removeItem(CLE); } catch (e) {}
+    champs.forEach(champ => {
+      if (champ.type === "checkbox") champ.checked = false;
+      else champ.value = "";
+    });
   }
 
   function sauvegarder() {
-    const donnees = {};
-    champs.forEach(champ => {
-      donnees[champ.id] = champ.type === "checkbox" ? champ.checked : champ.value;
-    });
-    try {
-      localStorage.setItem(CLE, JSON.stringify(donnees));
-      const heure = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-      etatSauvegarde.textContent = "✓ Enregistré à " + heure;
-    } catch (e) {
-      etatSauvegarde.textContent = "Sauvegarde indisponible sur ce navigateur";
-    }
+    /* Pas de persistance entre connexions : la copie reste vierge au prochain
+       chargement. On supprime aussi toute donnée résiduelle. */
+    try { localStorage.removeItem(CLE); } catch (e) {}
+    etatSauvegarde.textContent = "Copie non enregistrée entre les connexions";
   }
 
   /* Compte les lignes réellement occupées à l'écran (utile pour la consigne

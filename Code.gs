@@ -82,6 +82,13 @@ var HEADERS = [
 
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) || 'ping';
+  if (action === 'list') {
+    var token = (e && e.parameter && e.parameter.token) || '';
+    if (CONFIG.TOKEN && token !== CONFIG.TOKEN) {
+      return jsonOut({ ok: false, error: 'Jeton invalide.' });
+    }
+    return jsonOut(handleList({}));
+  }
   if (action === 'synthese') return jsonOut(regenererSynthese());
   return jsonOut(handlePing());
 }
@@ -94,6 +101,7 @@ function doPost(e) {
     }
     var action = data.action || 'append';
     if (action === 'ping') return jsonOut(handlePing());
+    if (action === 'list') return jsonOut(handleList(data));
     if (action === 'synthese') return jsonOut(regenererSynthese());
     if (action === 'append') return jsonOut(handleAppend(data));
     return jsonOut({ ok: false, error: 'Action inconnue : ' + action });
@@ -319,7 +327,7 @@ function identifiant(nom, prenom, classe) {
 }
 
 /* ==========================================================================
- *  LECTURE DES COPIES
+ *  LECTURE / EXPORT DES COPIES
  * ========================================================================== */
 
 function lireCopies() {
@@ -331,6 +339,32 @@ function lireCopies() {
     HEADERS.forEach(function (h, i) { o[h] = r[i]; });
     return o;
   });
+}
+
+/** Renvoie toutes les copies pour le tableau de bord résultats (lecture seule). */
+function handleList(data) {
+  preparerFeuilles();
+  var copies = lireCopies();
+  return {
+    ok: true,
+    headers: HEADERS,
+    copies: copies,
+    count: copies.length,
+    format: CONFIG.FORMAT
+  };
+}
+
+/** Renvoie toutes les copies pour le tableau de bord résultats (lecture seule). */
+function handleList(data) {
+  preparerFeuilles();
+  var copies = lireCopies();
+  return {
+    ok: true,
+    headers: HEADERS,
+    copies: copies,
+    count: copies.length,
+    format: CONFIG.FORMAT
+  };
 }
 
 /* Une copie est traitée dès que le professeur l'a validée, qu'il ait passé

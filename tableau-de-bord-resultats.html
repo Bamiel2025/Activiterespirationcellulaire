@@ -1,0 +1,373 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Tableau de bord — Résultats « L’énergie des muscles » (SVT 3e)</title>
+<style>
+  :root {
+    --encre: #17313b; --bleu: #2563eb; --bleu-clair: #eff6ff; --bleu-bord: #bfdbfe;
+    --vert: #15803d; --vert-clair: #f0fdf4; --vert-bord: #bbf7d0;
+    --ambre: #b45309; --ambre-clair: #fffbeb; --ambre-bord: #fde68a;
+    --rouge: #b91c1c; --rouge-clair: #fef2f2; --rouge-bord: #fecaca;
+    --teal: #0f766e; --teal-clair: #f0fdfa; --gris: #6b7280;
+    --fond: #f3f6f8; --carte: #ffffff; --bord: #d7e1e8; --ligne: #e5edf2;
+    --rayon: 12px; --ombre: 0 8px 24px rgba(10,36,56,.07);
+  }
+  * { box-sizing: border-box; }
+  body { margin: 0; background: var(--fond); color: var(--encre); font: 15px/1.5 "Segoe UI", Roboto, Arial, sans-serif; }
+  header { background: linear-gradient(135deg, #123947, #0f766e 55%, #2563eb); color: #fff; padding: 18px 22px 14px; }
+  header h1 { margin: 0; font-size: 1.35rem; }
+  header p { margin: 4px 0 0; opacity: .9; font-size: .9rem; }
+  main { max-width: 1240px; margin: 0 auto; padding: 16px; }
+  .carte { background: var(--carte); border: 1px solid var(--bord); border-radius: var(--rayon); box-shadow: var(--ombre); padding: 14px 16px; margin-bottom: 14px; }
+  .carte h2 { margin: 0 0 10px; font-size: 1rem; color: var(--teal); }
+  .ligne-cfg { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; }
+  .champ { display: flex; flex-direction: column; gap: 3px; flex: 1 1 260px; }
+  .champ label { font-size: .78rem; font-weight: 700; color: var(--gris); }
+  input[type="text"], input[type="password"], select, textarea {
+    font: inherit; padding: 8px 10px; border: 1px solid var(--bord); border-radius: 8px; background: #fff; color: var(--encre);
+  }
+  textarea { min-height: 90px; resize: vertical; width: 100%; }
+  button { font: inherit; font-weight: 700; padding: 8px 14px; border-radius: 8px; border: 1px solid var(--teal); background: var(--teal); color: #fff; cursor: pointer; }
+  button:hover { filter: brightness(1.05); }
+  button.secondaire { background: #fff; color: var(--teal); }
+  button:disabled { opacity: .55; cursor: default; }
+  .note { font-size: .84rem; color: var(--gris); margin: 8px 0 0; }
+  .erreur { color: var(--rouge); font-weight: 700; }
+  .ok { color: var(--vert); font-weight: 700; }
+  .kpis { display: grid; grid-template-columns: repeat(auto-fit, minmax(170px, 1fr)); gap: 10px; }
+  .kpi { border: 1px solid var(--bord); border-radius: 10px; padding: 10px 12px; background: #fafcfd; }
+  .kpi .v { font-size: 1.55rem; font-weight: 800; color: var(--teal); line-height: 1.1; }
+  .kpi .l { font-size: .78rem; color: var(--gris); font-weight: 700; }
+  .grille2 { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+  @media (max-width: 900px) { .grille2 { grid-template-columns: 1fr; } }
+  table { width: 100%; border-collapse: collapse; font-size: .88rem; }
+  th, td { padding: 7px 8px; border-bottom: 1px solid var(--ligne); text-align: left; vertical-align: top; }
+  th { background: #f7fafc; color: var(--gris); font-size: .78rem; text-transform: uppercase; letter-spacing: .02em; }
+  .num { text-align: right; font-variant-numeric: tabular-nums; }
+  .niv { display: inline-block; padding: 2px 8px; border-radius: 999px; font-weight: 700; font-size: .78rem; white-space: nowrap; }
+  .niv.TS { background: var(--vert-clair); color: var(--vert); border: 1px solid var(--vert-bord); }
+  .niv.S  { background: var(--bleu-clair); color: var(--bleu); border: 1px solid var(--bleu-bord); }
+  .niv.F  { background: var(--ambre-clair); color: var(--ambre); border: 1px solid var(--ambre-bord); }
+  .niv.I  { background: var(--rouge-clair); color: var(--rouge); border: 1px solid var(--rouge-bord); }
+  .barres { display: flex; flex-direction: column; gap: 8px; }
+  .barre-ligne { display: grid; grid-template-columns: 210px 1fr 46px; gap: 8px; align-items: center; }
+  @media (max-width: 700px) { .barre-ligne { grid-template-columns: 1fr; gap: 3px; } }
+  .barre-ligne .lib { font-size: .84rem; font-weight: 700; }
+  .pile { display: flex; height: 18px; border-radius: 9px; overflow: hidden; background: #edf2f7; border: 1px solid var(--ligne); }
+  .pile span { display: block; height: 100%; }
+  .pile .TS { background: #86efac; } .pile .S { background: #93c5fd; }
+  .pile .F  { background: #fcd34d; } .pile .I { background: #fca5a5; }
+  .legende { display: flex; gap: 12px; flex-wrap: wrap; font-size: .8rem; color: var(--gris); margin-top: 6px; }
+  .legende i { display: inline-block; width: 11px; height: 11px; border-radius: 3px; vertical-align: -1px; margin-right: 4px; }
+  .tabs { display: flex; gap: 6px; flex-wrap: wrap; margin-bottom: 10px; }
+  .tab { padding: 6px 12px; border-radius: 999px; border: 1px solid var(--bord); background: #fff; color: var(--encre); font-weight: 700; font-size: .84rem; cursor: pointer; }
+  .tab.actif { background: var(--teal); color: #fff; border-color: var(--teal); }
+  .vue { display: none; } .vue.actif { display: block; }
+  .filtres { display: flex; gap: 8px; flex-wrap: wrap; align-items: end; margin-bottom: 10px; }
+  .filtres .champ { flex: 0 1 220px; }
+  .table-wrap { overflow: auto; border: 1px solid var(--ligne); border-radius: 10px; }
+  tr.clickable { cursor: pointer; } tr.clickable:hover td { background: #f7fbff; }
+  details { border: 1px solid var(--ligne); border-radius: 10px; padding: 8px 10px; background: #fbfdfe; }
+  details + details { margin-top: 8px; }
+  summary { cursor: pointer; font-weight: 700; }
+  .manques { color: var(--ambre); font-size: .84rem; }
+  .alerte { color: var(--rouge); font-size: .84rem; }
+  pre.rep { white-space: pre-wrap; background: #f8fafc; border: 1px solid var(--ligne); border-radius: 8px; padding: 8px 10px; margin: 6px 0 0; font: 13px/1.45 Consolas, monospace; }
+  .actions { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 10px; }
+  @media print { header, .carte.cfg, .tabs, .filtres, .actions, .no-print { display: none !important; } .vue { display: block !important; } body { background: #fff; } .carte { box-shadow: none; } }
+</style>
+</head>
+<body>
+<header>
+  <h1>Tableau de bord des résultats — « L’énergie des muscles »</h1>
+  <p>SVT 3e · import depuis Google Sheet · vue par classe, par compétence et par élève (lecture seule, fichier autonome).</p>
+</header>
+<main>
+  <section class="carte cfg">
+    <h2>1. Source des données (Google Sheet)</h2>
+    <div class="ligne-cfg">
+      <div class="champ" style="flex:3 1 420px">
+        <label for="url">URL <code>/exec</code> de l’Apps Script (même que l’activité élève)</label>
+        <input type="text" id="url" value="https://script.google.com/macros/s/AKfycbwl_w1gXhcmxV04HIRCrHvErTAuFyX4fOTJPhSooA7kxl15c4t_XuYnoB-S3sqPJpNr/exec" spellcheck="false" autocomplete="off">
+      </div>
+      <div class="champ" style="flex:1 1 160px">
+        <label for="jeton">Jeton</label>
+        <input type="text" id="jeton" value="respiration-2027" autocomplete="off">
+      </div>
+      <div style="display:flex;gap:8px;align-items:end">
+        <button type="button" id="btn-charger">Importer les résultats</button>
+        <button type="button" id="btn-csv" class="secondaire" disabled>Exporter CSV</button>
+      </div>
+    </div>
+    <p id="etat" class="note" role="status" aria-live="polite">Prêt. L’URL et le jeton sont pré-remplis ; clique sur « Importer les résultats ».</p>
+    <p class="note">⚠️ Cette page lit les copies via l’action <code>list</code> de <code>Code.gs</code>. Si tu vois « Action inconnue », redéploie dans Apps Script une <strong>nouvelle version</strong> du <code>Code.gs</code> du dossier (il inclut <code>list</code>), en gardant le même jeton et « Qui a accès : Tout le monde ». Aucune donnée élève n’est modifiée. Le calcul affiché reprend l’analyse transmise par l’activité (indicateur, à valider par le professeur).</p>
+  </section>
+
+  <section id="rapport" style="display:none">
+    <section class="carte">
+      <h2>Vue d’ensemble</h2>
+      <div class="kpis" id="kpis"></div>
+    </section>
+
+    <div class="tabs">
+      <button type="button" class="tab actif" data-vue="classes">Par classe</button>
+      <button type="button" class="tab" data-vue="competences">Par compétence</button>
+      <button type="button" class="tab" data-vue="eleves">Par élève</button>
+      <button type="button" class="tab" data-vue="remediation">Remédiation</button>
+    </div>
+
+    <section id="vue-classes" class="vue actif carte">
+      <h2>Résultats par classe</h2>
+      <div id="classes-contenu"></div>
+    </section>
+
+    <section id="vue-competences" class="vue carte">
+      <h2>Résultats par compétence</h2>
+      <div id="competences-contenu"></div>
+      <p class="note">D4.2 = lire/exploiter des données (/4) · D4.1 = démarche scientifique (/6) · D1.3 = communiquer en langage scientifique, dont maîtrise de la langue (/10). Total /20.</p>
+    </section>
+
+    <section id="vue-eleves" class="vue carte">
+      <h2>Résultats par élève</h2>
+      <div class="filtres">
+        <div class="champ"><label for="f-classe">Classe</label><select id="f-classe"></select></div>
+        <div class="champ"><label for="f-niveau">Niveau global</label><select id="f-niveau"></select></div>
+        <div class="champ" style="flex:1 1 260px"><label for="f-recherche">Recherche (nom, prénom)</label><input type="text" id="f-recherche" placeholder="ex. Dupont"></div>
+      </div>
+      <div class="table-wrap"><table id="table-eleves">
+        <thead><tr><th>Élève</th><th>Classe</th><th class="num">/20</th><th>Global</th><th>D4.2</th><th>D4.1</th><th>D1.3</th><th>À valider</th><th class="num">Envois</th></tr></thead>
+        <tbody></tbody>
+      </table></div>
+      <p class="note">Clique sur un élève pour afficher le détail de sa copie.</p>
+      <div id="detail-eleve" style="margin-top:12px"></div>
+    </section>
+
+    <section id="vue-remediation" class="vue carte">
+      <h2>Remédiation (Fragile / Insuffisante, copies non validées)</h2>
+      <div id="remediation-contenu"></div>
+    </section>
+
+    <div class="actions no-print">
+      <button type="button" class="secondaire" onclick="window.print()">Imprimer / PDF</button>
+    </div>
+  </section>
+</main>
+
+<script>
+(function () {
+  "use strict";
+  var NIVEAUX = ["Très satisfaisante", "Satisfaisante", "Fragile", "Insuffisante"];
+  var NCLASS = { "Très satisfaisante": "TS", "Satisfaisante": "S", "Fragile": "F", "Insuffisante": "I" };
+  var COMPS = [
+    { code: "D4.2", niveau: "D4_2_NIVEAU", score: "D4_2_SCORE", manques: "D4_2_MANQUES", max: 4, lib: "Lire et exploiter des données quantitatives" },
+    { code: "D4.1", niveau: "D4_1_NIVEAU", score: "D4_1_SCORE", manques: "D4_1_MANQUES", max: 6, lib: "Pratiquer une démarche scientifique" },
+    { code: "D1.3", niveau: "D1_3_NIVEAU", score: "D1_3_SCORE", manques: "D1_3_MANQUES", max: 10, lib: "Communiquer en langage scientifique" }
+  ];
+  var DATA = [];
+
+  function $(id) { return document.getElementById(id); }
+  function esc(s) { return String(s == null ? "" : s).replace(/&/g,"&amp;").replace(/</g,"&lt;").replace(/>/g,"&gt;").replace(/"/g,"&quot;"); }
+  function niv(v) { var n = v || "Insuffisante"; return '<span class="niv ' + (NCLASS[n] || "I") + '">' + esc(n) + '</span>'; }
+  function num(v) { var n = Number(v); return isFinite(n) ? n : 0; }
+  function nom(r) { return (String(r.PRENOM || "") + " " + String(r.NOM || "")).trim() || "—"; }
+  function validee(r) { return String(r.A_VALIDER) === "Non" || String(r.VALIDATION_PROF || "").trim().length > 0; }
+
+  function etat(msg, cls) { var e = $("etat"); e.textContent = msg; e.className = "note " + (cls || ""); }
+
+  async function importer() {
+    var url = $("url").value.trim();
+    var jeton = $("jeton").value.trim();
+    if (!url) { etat("Renseigne l’URL /exec.", "erreur"); return; }
+    $("btn-charger").disabled = true;
+    etat("Import en cours…");
+    var corps = JSON.stringify({ action: "list", token: jeton, format: "energie-muscles-v1" });
+    try {
+      var reponse = await fetch(url, { method: "POST", headers: { "Content-Type": "text/plain;charset=utf-8" }, body: corps, redirect: "follow" });
+      var texte = await reponse.text();
+      var data;
+      try { data = JSON.parse(texte); } catch (e) {
+        etat("Réponse illisible (CORS/déploiement). Vérifie que Code.gs est redéployé en nouvelle version avec l’action « list » et « Accès : Tout le monde ».", "erreur");
+        return;
+      }
+      if (!data || data.ok === false) { etat("✗ " + (data && data.error ? data.error : "Erreur."), "erreur"); return; }
+      DATA = Array.isArray(data.copies) ? data.copies : [];
+      DATA.sort(function (a,b) { return String(a.CLASSE).localeCompare(String(b.CLASSE),"fr") || String(a.NOM).localeCompare(String(b.NOM),"fr") || String(a.PRENOM).localeCompare(String(b.PRENOM),"fr"); });
+      $("btn-csv").disabled = !DATA.length;
+      $("rapport").style.display = DATA.length ? "" : "none";
+      if (!DATA.length) { etat("Connexion OK, mais aucune copie reçue pour le moment.", "ok"); return; }
+      rendre();
+      etat("✓ " + DATA.length + " copie(s) importée(s). (Lecture seule : aucune donnée modifiée.)", "ok");
+    } catch (e) {
+      etat("✗ Import impossible : " + (e && e.message ? e.message : e) + ". Vérifie l’URL, le réseau et le déploiement Apps Script.", "erreur");
+    } finally { $("btn-charger").disabled = false; }
+  }
+
+  function classes() {
+    var m = {};
+    DATA.forEach(function (r) { var c = String(r.CLASSE || "Sans classe").trim() || "Sans classe"; (m[c] = m[c] || []).push(r); });
+    return Object.keys(m).sort(function (a,b){ return a.localeCompare(b,"fr"); }).map(function (c) { return { nom: c, rows: m[c] }; });
+  }
+
+  function moyenne(rows) { if (!rows.length) return 0; var s = 0; rows.forEach(function (r){ s += num(r.TOTAL_20); }); return Math.round((s / rows.length) * 10) / 10; }
+  function compteNiveau(rows, champ, niveau) { var n = 0; rows.forEach(function (r){ if (String(r[champ]) === niveau) n++; }); return n; }
+
+  function barres(rows, champ) {
+    var total = rows.length || 1;
+    var html = '<div class="pile">';
+    NIVEAUX.forEach(function (n) { var c = compteNiveau(rows, champ, n); if (c) html += '<span class="' + NCLASS[n] + '" style="width:' + (c/total*100) + '%" title="' + esc(n) + ' : ' + c + '"></span>'; });
+    html += '</div><div class="legende">';
+    NIVEAUX.forEach(function (n) { var c = compteNiveau(rows, champ, n); html += '<span><i style="background:' + {TS:"#86efac",S:"#93c5fd",F:"#fcd34d",I:"#fca5a5"}[NCLASS[n]] + '"></i>' + esc(n) + ' : ' + c + '</span>'; });
+    return html + '</div>';
+  }
+
+  function rendreKpis() {
+    var aValider = DATA.filter(function (r){ return !validee(r); }).length;
+    var fragiles = DATA.filter(function (r){ return NIVEAUX.indexOf(r.NIVEAU_GLOBAL) >= 2; }).length;
+    $("kpis").innerHTML =
+      '<div class="kpi"><div class="v">' + DATA.length + '</div><div class="l">Copies importées</div></div>' +
+      '<div class="kpi"><div class="v">' + classes().length + '</div><div class="l">Classes</div></div>' +
+      '<div class="kpi"><div class="v">' + moyenne(DATA) + ' <span style="font-size:.9rem;color:var(--gris)">/20</span></div><div class="l">Moyenne globale (indic.)</div></div>' +
+      '<div class="kpi"><div class="v">' + fragiles + '</div><div class="l">Fragile / Insuffisante</div></div>' +
+      '<div class="kpi"><div class="v">' + aValider + '</div><div class="l">À valider (prof.)</div></div>';
+  }
+
+  function rendreClasses() {
+    var cls = classes();
+    var html = '<div class="table-wrap"><table><thead><tr><th>Classe</th><th class="num">Élèves</th><th class="num">Moy. /20</th><th>Global</th><th>D4.2</th><th>D4.1</th><th>D1.3</th></tr></thead><tbody>';
+    cls.forEach(function (c) {
+      html += '<tr><td><strong>' + esc(c.nom) + '</strong></td><td class="num">' + c.rows.length + '</td><td class="num"><strong>' + moyenne(c.rows) + '</strong></td>' +
+        '<td style="min-width:180px">' + barres(c.rows, "NIVEAU_GLOBAL") + '</td>' +
+        '<td style="min-width:160px">' + barres(c.rows, "D4_2_NIVEAU") + '</td>' +
+        '<td style="min-width:160px">' + barres(c.rows, "D4_1_NIVEAU") + '</td>' +
+        '<td style="min-width:160px">' + barres(c.rows, "D1_3_NIVEAU") + '</td></tr>';
+    });
+    html += '</tbody></table></div>';
+    cls.forEach(function (c) {
+      html += '<details style="margin-top:10px"><summary>' + esc(c.nom) + ' — ' + c.rows.length + ' élève(s), moyenne ' + moyenne(c.rows) + '/20</summary>';
+      html += '<div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Élève</th><th class="num">/20</th><th>Global</th><th>D4.2</th><th>D4.1</th><th>D1.3</th><th>À valider</th></tr></thead><tbody>';
+      c.rows.forEach(function (r) { html += '<tr><td>' + esc(nom(r)) + '</td><td class="num">' + num(r.TOTAL_20) + '</td><td>' + niv(r.NIVEAU_GLOBAL) + '</td><td>' + niv(r.D4_2_NIVEAU) + '</td><td>' + niv(r.D4_1_NIVEAU) + '</td><td>' + niv(r.D1_3_NIVEAU) + '</td><td>' + (validee(r) ? 'Non' : 'Oui') + '</td></tr>'; });
+      html += '</tbody></table></div></details>';
+    });
+    $("classes-contenu").innerHTML = html;
+  }
+
+  function rendreCompetences() {
+    var html = '<div class="grille2">';
+    COMPS.forEach(function (c) {
+      var champ = c.niveau, sChamp = c.score;
+      var moy = 0; DATA.forEach(function (r){ moy += num(r[sChamp]); }); moy = DATA.length ? Math.round((moy/DATA.length)*10)/10 : 0;
+      html += '<div class="carte" style="margin:0"><h2 style="font-size:.95rem">' + esc(c.code) + ' — ' + esc(c.lib) + '</h2>' +
+        '<div class="note">Moyenne : <strong>' + moy + ' / ' + c.max + '</strong></div>' +
+        '<div class="barre-ligne" style="grid-template-columns:1fr;margin-top:8px"><div>' + barres(DATA, champ) + '</div></div>' +
+        '<div class="table-wrap" style="margin-top:10px"><table><thead><tr><th>Classe</th><th class="num">Moy.</th><th>Répartition</th></tr></thead><tbody>';
+      classes().forEach(function (cl) {
+        var m = 0; cl.rows.forEach(function (r){ m += num(r[sChamp]); }); m = cl.rows.length ? Math.round((m/cl.rows.length)*10)/10 : 0;
+        html += '<tr><td>' + esc(cl.nom) + '</td><td class="num">' + m + '/' + c.max + '</td><td>' + barres(cl.rows, champ) + '</td></tr>';
+      });
+      html += '</tbody></table></div></div>';
+    });
+    var moyG = moyenne(DATA);
+    html += '<div class="carte" style="margin:0"><h2 style="font-size:.95rem">Niveau global (total /20)</h2>' +
+      '<div class="note">Moyenne : <strong>' + moyG + ' / 20</strong></div>' +
+      '<div class="barre-ligne" style="grid-template-columns:1fr;margin-top:8px"><div>' + barres(DATA, "NIVEAU_GLOBAL") + '</div></div></div>';
+    html += '</div>';
+    $("competences-contenu").innerHTML = html;
+  }
+
+  function options(select, values, labelAll) {
+    var html = '<option value="">' + esc(labelAll) + '</option>';
+    values.forEach(function (v) { html += '<option value="' + esc(v) + '">' + esc(v) + '</option>'; });
+    select.innerHTML = html;
+  }
+
+  function rendreEleves() {
+    options($("f-classe"), classes().map(function (c){ return c.nom; }), "Toutes les classes");
+    options($("f-niveau"), NIVEAUX, "Tous les niveaux");
+    dessinerTableEleves();
+  }
+
+  function filtrerEleves() {
+    var cl = $("f-classe").value, nv = $("f-niveau").value, q = $("f-recherche").value.trim().toLowerCase();
+    return DATA.filter(function (r) {
+      if (cl && String(r.CLASSE || "Sans classe").trim() !== cl) return false;
+      if (nv && String(r.NIVEAU_GLOBAL) !== nv) return false;
+      if (q && nom(r).toLowerCase().indexOf(q) < 0) return false;
+      return true;
+    });
+  }
+
+  function dessinerTableEleves() {
+    var rows = filtrerEleves();
+    var tb = $("table-eleves").querySelector("tbody");
+    if (!rows.length) { tb.innerHTML = '<tr><td colspan="9">Aucun résultat.</td></tr>'; $("detail-eleve").innerHTML = ""; return; }
+    tb.innerHTML = rows.map(function (r, i) {
+      return '<tr class="clickable" data-i="' + i + '"><td><strong>' + esc(nom(r)) + '</strong></td><td>' + esc(r.CLASSE) + '</td><td class="num"><strong>' + num(r.TOTAL_20) + '</strong></td><td>' + niv(r.NIVEAU_GLOBAL) + '</td><td>' + niv(r.D4_2_NIVEAU) + ' <span class="note">' + num(r.D4_2_SCORE) + '/4</span></td><td>' + niv(r.D4_1_NIVEAU) + ' <span class="note">' + num(r.D4_1_SCORE) + '/6</span></td><td>' + niv(r.D1_3_NIVEAU) + ' <span class="note">' + num(r.D1_3_SCORE) + '/10</span></td><td>' + (validee(r) ? 'Non' : '<span class="alerte">Oui</span>') + '</td><td class="num">' + (num(r.NB_ENVOIS)||1) + '</td></tr>';
+    }).join("");
+    tb.querySelectorAll("tr").forEach(function (tr) {
+      tr.addEventListener("click", function () { afficherDetail(rows[Number(tr.getAttribute("data-i"))]); });
+    });
+    $("detail-eleve").innerHTML = "";
+  }
+
+  function blocRep(titre, texte) { return '<details><summary>' + esc(titre) + '</summary><pre class="rep">' + esc(texte || "(aucune réponse)") + '</pre></details>'; }
+
+  function afficherDetail(r) {
+    var html = '<div class="carte" style="margin:0;border-color:var(--bleu-bord)"><h2>' + esc(nom(r)) + ' — ' + esc(r.CLASSE) + ' <span class="note">(' + num(r.TOTAL_20) + '/20, ' + esc(r.NIVEAU_GLOBAL) + ', ' + (validee(r) ? 'validé' : 'à valider') + ')</span></h2>';
+    html += '<div class="grille2"><div><h2 style="font-size:.92rem">Compétences</h2><table><thead><tr><th>Comp.</th><th class="num">Score</th><th>Niveau</th><th>Ce qui manque</th></tr></thead><tbody>';
+    COMPS.forEach(function (c) { html += '<tr><td><strong>' + c.code + '</strong></td><td class="num">' + num(r[c.score]) + '/' + c.max + '</td><td>' + niv(r[c.niveau]) + '</td><td class="manques">' + esc(r[c.manques] || "—") + '</td></tr>'; });
+    html += '</tbody></table>' + (r.ALERTES ? '<p class="alerte" style="margin-top:8px"><strong>Alertes :</strong> ' + esc(r.ALERTES) + '</p>' : '') + (r.RESUME ? '<p class="note" style="margin-top:8px">' + esc(r.RESUME) + '</p>' : '') + '</div>';
+    html += '<div><h2 style="font-size:.92rem">Réponses</h2>' + blocRep("Q1 — Comparer et interpréter (D4.2)", r.Q1) + blocRep("Q2 — Expliquer et modéliser (D4.1)", r.Q2) + blocRep("Q3 — Rédiger 10–15 lignes (D1.3)", r.Q3) + '</div></div></div>';
+    $("detail-eleve").innerHTML = html;
+    $("detail-eleve").scrollIntoView({ behavior: "smooth", block: "nearest" });
+  }
+
+  function rendreRemediation() {
+    var champs = COMPS;
+    var html = '';
+    champs.forEach(function (c) {
+      var lignes = DATA.filter(function (r) { return !validee(r) && NIVEAUX.indexOf(r[c.niveau]) >= 2; });
+      html += '<details' + (lignes.length ? ' open' : '') + '><summary>' + esc(c.code) + ' — ' + esc(c.lib) + ' : ' + lignes.length + ' élève(s) à accompagner</summary>';
+      if (!lignes.length) { html += '<p class="note">Aucun élève fragile/insuffisant (non validé) sur cette compétence.</p>'; }
+      else {
+        html += '<div class="table-wrap" style="margin-top:8px"><table><thead><tr><th>Élève</th><th>Classe</th><th>Niveau</th><th class="num">Score</th><th>Ce qui manque</th></tr></thead><tbody>';
+        lignes.forEach(function (r) { html += '<tr><td>' + esc(nom(r)) + '</td><td>' + esc(r.CLASSE) + '</td><td>' + niv(r[c.niveau]) + '</td><td class="num">' + num(r[c.score]) + '/' + c.max + '</td><td class="manques">' + esc(r[c.manques] || "—") + '</td></tr>'; });
+        html += '</tbody></table></div>';
+      }
+      html += '</details>';
+    });
+    var valCount = DATA.filter(validee).length;
+    if (valCount) html += '<p class="note" style="margin-top:10px">' + valCount + ' copie(s) déjà validée(s) par le professeur : non affichée(s) ici.</p>';
+    $("remediation-contenu").innerHTML = html;
+  }
+
+  function rendre() { rendreKpis(); rendreClasses(); rendreCompetences(); rendreEleves(); rendreRemediation(); }
+
+  function exporterCSV() {
+    if (!DATA.length) return;
+    var cols = ["HORODATAGE","NOM","PRENOM","CLASSE","TOTAL_20","NIVEAU_GLOBAL","D4_2_SCORE","D4_2_NIVEAU","D4_1_SCORE","D4_1_NIVEAU","D1_3_SCORE","D1_3_NIVEAU","A_VALIDER","NOTE_PROF","ALERTES"];
+    function cell(v) { var s = String(v == null ? "" : v).replace(/"/g,'""'); return '"' + s + '"'; }
+    var lignes = [cols.join(";")].concat(DATA.map(function (r) { return cols.map(function (c) { return cell(r[c]); }).join(";"); }));
+    var blob = new Blob(["\uFEFF" + lignes.join("\r\n")], { type: "text/csv;charset=utf-8" });
+    var a = document.createElement("a"); a.href = URL.createObjectURL(blob); a.download = "resultats_energie_muscles.csv";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(a.href); }, 1000);
+  }
+
+  document.querySelectorAll(".tab").forEach(function (btn) {
+    btn.addEventListener("click", function () {
+      document.querySelectorAll(".tab").forEach(function (b){ b.classList.remove("actif"); });
+      document.querySelectorAll(".vue").forEach(function (v){ v.classList.remove("actif"); });
+      btn.classList.add("actif");
+      $("vue-" + btn.getAttribute("data-vue")).classList.add("actif");
+    });
+  });
+  $("f-classe").addEventListener("change", dessinerTableEleves);
+  $("f-niveau").addEventListener("change", dessinerTableEleves);
+  $("f-recherche").addEventListener("input", dessinerTableEleves);
+  $("btn-charger").addEventListener("click", importer);
+  $("btn-csv").addEventListener("click", exporterCSV);
+})();
+</script>
+</body>
+</html>

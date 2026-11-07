@@ -334,8 +334,10 @@
     const base = configurationEmbarquee();
     try {
       const sauve = JSON.parse(localStorage.getItem(CLE_CONFIG) || "null");
-      if (sauve && typeof sauve.url === "string") {
-        return { url: sauve.url.trim(), jeton: (sauve.jeton || base.jeton).trim() };
+      if (sauve && typeof sauve === "object") {
+        const url = (sauve.url && String(sauve.url).trim()) ? String(sauve.url).trim() : base.url;
+        const jeton = (sauve.jeton && String(sauve.jeton).trim()) ? String(sauve.jeton).trim() : base.jeton;
+        return { url: url, jeton: jeton };
       }
     } catch (e) { /* localStorage indisponible : config embarquée */ }
     return base;

@@ -6,7 +6,7 @@
 <!-- Configuration de l'export Google Sheets. Valeurs injectées à la construction
      par build.py depuis _build/config.txt ; surchargeable par le professeur
      (onglet Fiche professeur, code 2027) et mémorisée en localStorage. -->
-<meta name="sheet-url" content="">
+<meta name="sheet-url" content="https://script.google.com/macros/s/AKfycbwl_w1gXhcmxV04HIRCrHvErTAuFyX4fOTJPhSooA7kxl15c4t_XuYnoB-S3sqPJpNr/exec">
 <meta name="sheet-jeton" content="respiration-2027">
 <title>L’énergie des muscles — La respiration cellulaire (SVT 3e)</title>
 <style>
@@ -56850,8 +56850,10 @@ class CSS2DRenderer {
     const base = configurationEmbarquee();
     try {
       const sauve = JSON.parse(localStorage.getItem(CLE_CONFIG) || "null");
-      if (sauve && typeof sauve.url === "string") {
-        return { url: sauve.url.trim(), jeton: (sauve.jeton || base.jeton).trim() };
+      if (sauve && typeof sauve === "object") {
+        const url = (sauve.url && String(sauve.url).trim()) ? String(sauve.url).trim() : base.url;
+        const jeton = (sauve.jeton && String(sauve.jeton).trim()) ? String(sauve.jeton).trim() : base.jeton;
+        return { url: url, jeton: jeton };
       }
     } catch (e) { /* localStorage indisponible : config embarquée */ }
     return base;

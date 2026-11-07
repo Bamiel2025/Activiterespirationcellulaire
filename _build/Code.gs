@@ -80,6 +80,16 @@ var HEADERS = [
  *  POINTS D'ENTRÉE HTTP
  * ========================================================================== */
 
+function onOpen() {
+  try {
+    SpreadsheetApp.getUi()
+      .createMenu('Respiration cellulaire')
+      .addItem('Reconstruire Synthèse + Remédiation (reflète les suppressions)', 'regenererSynthese')
+      .addItem('Tester la connexion / préparer les onglets', 'handlePing')
+      .addToUi();
+  } catch (e) { /* Apps Script exécuté hors UI (web app) : ignorer */ }
+}
+
 function doGet(e) {
   var action = (e && e.parameter && e.parameter.action) || 'ping';
   if (action === 'list') {
@@ -89,7 +99,7 @@ function doGet(e) {
     }
     return jsonOut(handleList({}));
   }
-  if (action === 'synthese') return jsonOut(regenererSynthese());
+  if (action === 'synthese' || action === 'sync' || action === 'rebuild') return jsonOut(regenererSynthese());
   return jsonOut(handlePing());
 }
 
@@ -102,7 +112,7 @@ function doPost(e) {
     var action = data.action || 'append';
     if (action === 'ping') return jsonOut(handlePing());
     if (action === 'list') return jsonOut(handleList(data));
-    if (action === 'synthese') return jsonOut(regenererSynthese());
+    if (action === 'synthese' || action === 'sync' || action === 'rebuild') return jsonOut(regenererSynthese());
     if (action === 'append') return jsonOut(handleAppend(data));
     return jsonOut({ ok: false, error: 'Action inconnue : ' + action });
   } catch (err) {
@@ -341,6 +351,7 @@ function lireCopies() {
   });
 }
 
+/** Renvoie toutes les copies pour le tableau de bord résultats (lecture seule). */
 function handleList(data) {
   preparerFeuilles();
   var copies = lireCopies();
@@ -494,9 +505,6 @@ function mettreAJourRemediation() {
     'D4.1': { score: 'D4_1_SCORE', niveau: 'D4_1_NIVEAU', manques: 'D4_1_MANQUES' },
     'D1.3': { score: 'D1_3_SCORE', niveau: 'D1_3_NIVEAU', manques: 'D1_3_MANQUES' }
   };
-  /* Une copie validée par le professeur ne doit plus encombrer la liste de
-     remédiation : elle a déjà été traitée. Même règle que dans la synthèse
-     (dejaValidee), sinon les deux onglets se contredisent. */
   var validees = copies.filter(dejaValidee).length;
 
   var lignes = [];
@@ -504,8 +512,6 @@ function mettreAJourRemediation() {
     var ch = champs[c.code];
     copies.forEach(function (r) {
       if (dejaValidee(r)) return;
-      /* NIVEAUX = [Très satisfaisante(0), Satisfaisante(1), Fragile(2),
-         Insuffisante(3)] : la remédiation cible les index 2 et 3. */
       if (NIVEAUX.indexOf(r[ch.niveau]) >= 2) {  // Fragile ou Insuffisante
         lignes.push([
           c.code + ' — ' + c.libelle,
@@ -520,6 +526,8 @@ function mettreAJourRemediation() {
   if (lignes.length) {
     f.getRange(2, 1, lignes.length, entete.length).setValues(lignes);
     f.getRange(2, 1, lignes.length, entete.length).setWrapStrategy(SpreadsheetApp.WrapStrategy.WRAP);
+  } else if (!copies.length) {
+    f.getRange(2, 1).setValue('Aucune copie : supprime des lignes dans « Copies » puis utilise le menu « Respiration cellulaire > Reconstruire… » (ou attends le prochain envoi) pour synchroniser.');
   } else {
     f.getRange(2, 1).setValue('Aucun élève en maîtrise fragile ou insuffisante à remédier pour le moment.');
   }
